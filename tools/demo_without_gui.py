@@ -62,7 +62,7 @@ def parse_args():
     parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',
                         default='VGGnet_test')
     parser.add_argument('--model', dest='model', help='Model path',
-                        default=' ')
+                        required=True)
     parser.add_argument('im_name',required=True)
 
     args = parser.parse_args()
@@ -74,9 +74,6 @@ if __name__ == '__main__':
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
 
     args = parse_args()
-
-    if args.model == ' ':
-        raise IOError(('Error: Model not found.\n'))
         
     # init session
     sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
