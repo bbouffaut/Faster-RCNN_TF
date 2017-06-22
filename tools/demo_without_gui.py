@@ -24,7 +24,7 @@ def demo(sess, net, image_name):
     """Detect object classes in an image using pre-computed object proposals."""
 
     # Load the demo image
-    im_file = os.path.join(cfg.DATA_DIR, 'demo', image_name)
+    im_file = os.path.join(image_name)
     #im_file = os.path.join('/home/corgi/Lab/label/pos_frame/ACCV/training/000001/',image_name)
     im = cv2.imread(im_file)
 
@@ -63,7 +63,7 @@ def parse_args():
                         default='VGGnet_test')
     parser.add_argument('--model', dest='model', help='Model path',
                         required=True)
-    parser.add_argument('im_name',required=True)
+    parser.add_argument('image_name')
 
     args = parser.parse_args()
 
@@ -88,5 +88,5 @@ if __name__ == '__main__':
     
 
     print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    print 'Demo for data/demo/{}'.format(im_name)
-    demo(sess, net, args.im_name)
+    print 'Demo for {}'.format(args.image_name)
+    demo(sess, net, args.image_name)
