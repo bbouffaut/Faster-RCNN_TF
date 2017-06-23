@@ -10,16 +10,28 @@ import argparse
 from networks.factory import get_network
 
 
-CLASSES = ('__background__',
+'''CLASSES = ('__background__',
            'aeroplane', 'bicycle', 'bird', 'boat',
            'bottle', 'bus', 'car', 'cat', 'chair',
            'cow', 'diningtable', 'dog', 'horse',
            'motorbike', 'person', 'pottedplant',
-           'sheep', 'sofa', 'train', 'tvmonitor')
+           'sheep', 'sofa', 'train', 'tvmonitor')'''
 
 
-#CLASSES = ('__background__','person','bike','motorbike','car','bus')
+CLASSES = ('__background__','person','cat')
 
+def vis_detections(im, class_name, dets, thresh=0.5):
+    """Draw detected bounding boxes."""
+    inds = np.where(dets[:, -1] >= thresh)[0]
+    if len(inds) == 0:
+        return
+
+    for i in inds:
+        bbox = dets[i, :4]
+        score = dets[i, -1]
+	print(class_name,score)
+
+     
 def demo(sess, net, image_name):
     """Detect object classes in an image using pre-computed object proposals."""
 
@@ -32,8 +44,6 @@ def demo(sess, net, image_name):
     timer = Timer()
     timer.tic()
     scores, boxes = im_detect(sess, net, im)
-    print(scores)
-    print(boxes)
     timer.toc()
     print ('Detection took {:.3f}s for '
            '{:d} object proposals').format(timer.total_time, boxes.shape[0])
@@ -41,7 +51,6 @@ def demo(sess, net, image_name):
     CONF_THRESH = 0.8
     NMS_THRESH = 0.3
     for cls_ind, cls in enumerate(CLASSES[1:]):
-	print(cls_ind,cls)
         cls_ind += 1 # because we skipped background
         cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
         cls_scores = scores[:, cls_ind]
@@ -49,7 +58,7 @@ def demo(sess, net, image_name):
                           cls_scores[:, np.newaxis])).astype(np.float32)
         keep = nms(dets, NMS_THRESH)
         dets = dets[keep, :]
-	print(dets)
+	vis_detections(im,cls,dets, thresh=CONF_THRESH)
 
 def parse_args():
     """Parse input arguments."""
@@ -90,3 +99,4 @@ if __name__ == '__main__':
     print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
     print 'Demo for {}'.format(args.image_name)
     demo(sess, net, args.image_name)
+
