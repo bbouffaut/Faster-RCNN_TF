@@ -15,11 +15,11 @@ import datasets.kitti
 import datasets.kitti_tracking
 import numpy as np
 
-def _selective_search_IJCV_top_k(split, year, top_k):
+def _selective_search_IJCV_top_k(split, year, top_k, classes):
     """Return an imdb that uses the top k proposals from the selective search
     IJCV code.
     """
-    imdb = datasets.pascal_voc(split, year)
+    imdb = datasets.pascal_voc(split, year, classes)
     imdb.roidb_handler = imdb.selective_search_IJCV_roidb
     imdb.config['top_k'] = top_k
     return imdb
@@ -29,7 +29,7 @@ for year in ['2007', '2012']:
     for split in ['train', 'val', 'trainval', 'test']:
         name = 'voc_{}_{}'.format(year, split)
         __sets[name] = (lambda split=split, year=year:
-                datasets.pascal_voc(split, year))
+                datasets.pascal_voc(split, year, classes))
 """
 # Set up voc_<year>_<split>_top_<k> using selective search "quality" mode
 # but only returning the first k boxes

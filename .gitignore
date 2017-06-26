@@ -3,3 +3,7 @@
 *.o
 faster_rcnn_models
 *.ckpt
+VOCdevkit
+data/cache
+data/pretrain_model
+data/VOCdevkit2007

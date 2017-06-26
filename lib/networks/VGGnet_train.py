@@ -9,7 +9,12 @@ _feat_stride = [16,]
 anchor_scales = [8, 16, 32]
 
 class VGGnet_train(Network):
-    def __init__(self, trainable=True):
+    def __init__(self, classes, trainable=True):
+        global n_classes
+
+        if (classes != None):
+            n_classes = len(classes)
+
         self.inputs = []
         self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
         self.im_info = tf.placeholder(tf.float32, shape=[None, 3])
