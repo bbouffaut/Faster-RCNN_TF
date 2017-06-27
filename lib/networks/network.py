@@ -183,6 +183,8 @@ class Network(object):
             input[0] = input[0][0]
         with tf.variable_scope(name) as scope:
 
+            print("PROPOSAL_TARGET_LAYER input={0} classes={1} name={2}".format(input,classes,name))
+
             rois,labels,bbox_targets,bbox_inside_weights,bbox_outside_weights = tf.py_func(proposal_target_layer_py,[input[0],input[1],classes],[tf.float32,tf.float32,tf.float32,tf.float32,tf.float32])
 
             rois = tf.reshape(rois,[-1,5] , name = 'rois') 

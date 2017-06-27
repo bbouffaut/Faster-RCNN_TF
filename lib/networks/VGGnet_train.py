@@ -15,6 +15,8 @@ class VGGnet_train(Network):
         if (classes != None):
             n_classes = len(classes)
 
+        print("NB_CLASSES = {0}".format(n_classes))
+
         self.inputs = []
         self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
         self.im_info = tf.placeholder(tf.float32, shape=[None, 3])
