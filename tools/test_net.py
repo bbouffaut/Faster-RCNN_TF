@@ -13,7 +13,7 @@ import _init_paths
 from fast_rcnn.test import test_net
 from fast_rcnn.config import cfg, cfg_from_file
 from networks.factory import get_network
-import datasets.factory as datasets_factory
+from datasets.factory import factory as datasets_factory
 import argparse
 import pprint
 import time, os, sys
@@ -76,8 +76,8 @@ if __name__ == '__main__':
 
     weights_filename = os.path.splitext(os.path.basename(args.model))[0]
 
-    datasets_factory = datasets_factory(classes)
-    imdb = datasets_factory.get_imdb(args.imdb_name)
+    df = datasets_factory(args.classes)
+    imdb = df.get_imdb(args.imdb_name)
     imdb.competition_mode(args.comp_mode)
 
     device_name = '/{}:{:d}'.format(args.device,args.device_id)
