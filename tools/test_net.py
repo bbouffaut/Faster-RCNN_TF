@@ -76,6 +76,9 @@ if __name__ == '__main__':
 
     weights_filename = os.path.splitext(os.path.basename(args.model))[0]
 
+    if ('__background__' not in args.classes):
+        args.classes = args.classes.append('__background__')
+
     df = datasets_factory(args.classes)
     imdb = df.get_imdb(args.imdb_name)
     imdb.competition_mode(args.comp_mode)
@@ -83,7 +86,7 @@ if __name__ == '__main__':
     device_name = '/{}:{:d}'.format(args.device,args.device_id)
     print device_name
 
-    network = get_network(args.network_name)
+    network = get_network(args.network_name,args.classes)
     print 'Use network `{:s}` in training'.format(args.network_name)
 
     if args.device == 'gpu':

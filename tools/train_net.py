@@ -83,6 +83,11 @@ if __name__ == '__main__':
         # fix the random seeds (numpy and caffe) for reproducibility
         np.random.seed(cfg.RNG_SEED)
 
+    if ('__background__' not in args.classes):
+        args.classes.insert(0,'__background__')
+
+    print("DEBUG train_net {0}".format(args.classes))
+
     df = datasets_factory(args.classes)
     imdb = df.get_imdb(args.imdb_name)
     print 'Loaded dataset `{:s}` for training'.format(imdb.name)
@@ -94,7 +99,7 @@ if __name__ == '__main__':
     device_name = '/{}:{:d}'.format(args.device,args.device_id)
     print device_name
 
-    network = get_network(args.network_name)
+    network = get_network(args.network_name, args.classes)
     print 'Use network `{:s}` in training'.format(args.network_name)
 
     train_net(network, imdb, roidb, output_dir,
