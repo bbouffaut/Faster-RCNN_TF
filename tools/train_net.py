@@ -12,7 +12,7 @@
 import _init_paths
 from fast_rcnn.train import get_training_roidb, train_net
 from fast_rcnn.config import cfg,cfg_from_file, cfg_from_list, get_output_dir
-from datasets.factory import get_imdb
+import datasets.factory as datasets_factory
 from networks.factory import get_network
 import argparse
 import pprint
@@ -82,7 +82,9 @@ if __name__ == '__main__':
     if not args.randomize:
         # fix the random seeds (numpy and caffe) for reproducibility
         np.random.seed(cfg.RNG_SEED)
-    imdb = get_imdb(args.imdb_name)
+
+    datasets_factory = datasets_factory(classes)
+    imdb = datasets_factory.get_imdb(args.imdb_name)
     print 'Loaded dataset `{:s}` for training'.format(imdb.name)
     roidb = get_training_roidb(imdb)
 
@@ -95,6 +97,6 @@ if __name__ == '__main__':
     network = get_network(args.network_name)
     print 'Use network `{:s}` in training'.format(args.network_name)
 
-    train_net(network, imdb, roidb, output_dir,
+    train_net(network, imdb, roidb, output_dir, classes,
               pretrained_model=args.pretrained_model,
               max_iters=args.max_iters)
