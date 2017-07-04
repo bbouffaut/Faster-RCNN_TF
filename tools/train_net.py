@@ -53,6 +53,10 @@ def parse_args():
     parser.add_argument('--set', dest='set_cfgs',
                         help='set config keys', default=None,
                         nargs=argparse.REMAINDER)
+    parser.add_argument('--classes', dest='classes',
+                        help='set object classes to be detected', default=None,
+                        nargs='+')
+
 
     if len(sys.argv) == 1:
         parser.print_help()
