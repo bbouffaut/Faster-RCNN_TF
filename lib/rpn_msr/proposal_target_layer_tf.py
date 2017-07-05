@@ -13,13 +13,16 @@ from fast_rcnn.bbox_transform import bbox_transform
 from utils.cython_bbox import bbox_overlaps
 import pdb
 
-DEBUG = False
+DEBUG = True
 
 def proposal_target_layer(rpn_rois, gt_boxes,_num_classes):
     """
     Assign object detection proposals to ground-truth targets. Produces proposal
     classification labels and bounding-box regression targets.
     """
+
+    if DEBUG:
+        print('DEBUG proposal_target_layer num_classes={} rpn_rois_shape={} gt_boxes={}'.format(_num_classes,rpn_rois.shape,gt_boxes.shape))
 
     # Proposal ROIs (0, x1, y1, x2, y2) coming from RPN
     # (i.e., rpn.proposal_layer.ProposalLayer), or any other source
@@ -81,13 +84,23 @@ def _get_bbox_regression_labels(bbox_target_data, num_classes):
     clss = bbox_target_data[:, 0]
     bbox_targets = np.zeros((clss.size, 4 * num_classes), dtype=np.float32)
     bbox_inside_weights = np.zeros(bbox_targets.shape, dtype=np.float32)
+
     inds = np.where(clss > 0)[0]
+
+    if DEBUG:
+           print('DEBUG _get_bbox_regression_labels clss={} inds={}'.format(clss,inds))
+
     for ind in inds:
         cls = clss[ind]
         start = 4 * cls
         end = start + 4
-        bbox_targets[ind, start:end] = bbox_target_data[ind, 1:]
+
+        if DEBUG:
+            print('DEBUG _get_bbox_regression_labels ind={} cls={} start={} end={}'.format(ind,cls,start,end))
+
+        bbox_targets[ind, start:end] = bbox_target_data[ind, 1:] 
         bbox_inside_weights[ind, start:end] = cfg.TRAIN.BBOX_INSIDE_WEIGHTS
+
     return bbox_targets, bbox_inside_weights
 
 
@@ -103,6 +116,7 @@ def _compute_targets(ex_rois, gt_rois, labels):
         # Optionally normalize targets by a precomputed mean and stdev
         targets = ((targets - np.array(cfg.TRAIN.BBOX_NORMALIZE_MEANS))
                 / np.array(cfg.TRAIN.BBOX_NORMALIZE_STDS))
+
     return np.hstack(
             (labels[:, np.newaxis], targets)).astype(np.float32, copy=False)
 
@@ -150,6 +164,6 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
         rois[:, 1:5], gt_boxes[gt_assignment[keep_inds], :4], labels)
 
     bbox_targets, bbox_inside_weights = \
-        _get_bbox_regression_labels(bbox_target_data, num_classes)
+        _get_bbox_regression_labels(bbox_target_data, num_classes)   
 
     return labels, rois, bbox_targets, bbox_inside_weights
