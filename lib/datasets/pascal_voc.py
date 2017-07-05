@@ -29,6 +29,8 @@ class pascal_voc(imdb):
         self._devkit_path = self._get_default_path() if devkit_path is None \
                             else devkit_path
         self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
+
+        print('DEBUG pascal_voc classes: {}'.format(classes))
         
         if (classes == None):
             self._classes = ('__background__', # always index 0

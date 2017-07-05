@@ -201,6 +201,8 @@ def get_training_roidb(imdb):
 
 
 def get_data_layer(roidb, num_classes):
+    print('DEBUG get_data_layer num_classes: {}'.format(num_classes))
+
     """return a data layer."""
     if cfg.TRAIN.HAS_RPN:
         if cfg.IS_MULTISCALE:

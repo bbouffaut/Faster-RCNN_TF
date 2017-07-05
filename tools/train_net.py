@@ -83,8 +83,9 @@ if __name__ == '__main__':
         # fix the random seeds (numpy and caffe) for reproducibility
         np.random.seed(cfg.RNG_SEED)
 
-    if ('__background__' not in args.classes):
-        args.classes.insert(0,'__background__')
+    if (args.classes != None):
+        if ('__background__' not in args.classes):
+            args.classes.insert(0,'__background__')
 
     print("DEBUG train_net {0}".format(args.classes))
 
