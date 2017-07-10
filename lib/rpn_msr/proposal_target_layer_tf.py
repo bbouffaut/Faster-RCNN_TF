@@ -13,7 +13,7 @@ from fast_rcnn.bbox_transform import bbox_transform
 from utils.cython_bbox import bbox_overlaps
 import pdb
 
-DEBUG = True
+DEBUG = False
 
 def proposal_target_layer(rpn_rois, gt_boxes,_num_classes):
     """
@@ -50,7 +50,7 @@ def proposal_target_layer(rpn_rois, gt_boxes,_num_classes):
         all_rois, gt_boxes, fg_rois_per_image,
         rois_per_image, _num_classes)
 
-    if DEBUG:
+    '''if DEBUG:
         print 'num fg: {}'.format((labels > 0).sum())
         print 'num bg: {}'.format((labels == 0).sum())
         _count += 1
@@ -58,7 +58,7 @@ def proposal_target_layer(rpn_rois, gt_boxes,_num_classes):
         _bg_num += (labels == 0).sum()
         print 'num fg avg: {}'.format(_fg_num / _count)
         print 'num bg avg: {}'.format(_bg_num / _count)
-        print 'ratio: {:.3f}'.format(float(_fg_num) / float(_bg_num))
+        print 'ratio: {:.3f}'.format(float(_fg_num) / float(_bg_num))'''
 
     rois = rois.reshape(-1,5)
     labels = labels.reshape(-1,1)
@@ -88,7 +88,7 @@ def _get_bbox_regression_labels(bbox_target_data, num_classes):
     inds = np.where(clss > 0)[0]
 
     if DEBUG:
-           print('DEBUG _get_bbox_regression_labels clss={} inds={}'.format(clss,inds))
+           print('DEBUG _get_bbox_regression_labels bbox_target_data.shape={} clss={} clss.size={} inds={} bbox_targets.shape={} bbox_inside_weight.shape={}'.format(bbox_target_data.shape, clss, clss.size, inds,bbox_targets.shape,bbox_inside_weights.shape))
 
     for ind in inds:
         cls = clss[ind]
@@ -96,7 +96,7 @@ def _get_bbox_regression_labels(bbox_target_data, num_classes):
         end = start + 4
 
         if DEBUG:
-            print('DEBUG _get_bbox_regression_labels ind={} cls={} start={} end={}'.format(ind,cls,start,end))
+            print('DEBUG _get_bbox_regression_labels ind={} cls={} start={} end={} bbox_targets[ind,start:end]={} bbox_target_data[ind,1:]={}'.format(ind,cls,start,end,bbox_targets[ind,start:end],bbox_target_data[ind,1:]))
 
         bbox_targets[ind, start:end] = bbox_target_data[ind, 1:] 
         bbox_inside_weights[ind, start:end] = cfg.TRAIN.BBOX_INSIDE_WEIGHTS
@@ -112,6 +112,7 @@ def _compute_targets(ex_rois, gt_rois, labels):
     assert gt_rois.shape[1] == 4
 
     targets = bbox_transform(ex_rois, gt_rois)
+
     if cfg.TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED:
         # Optionally normalize targets by a precomputed mean and stdev
         targets = ((targets - np.array(cfg.TRAIN.BBOX_NORMALIZE_MEANS))
@@ -162,6 +163,9 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
 
     bbox_target_data = _compute_targets(
         rois[:, 1:5], gt_boxes[gt_assignment[keep_inds], :4], labels)
+
+    if DEBUG:
+        print('DEBUG _sample_rois bbox_target_data={}'.format(bbox_target_data))
 
     bbox_targets, bbox_inside_weights = \
         _get_bbox_regression_labels(bbox_target_data, num_classes)   
