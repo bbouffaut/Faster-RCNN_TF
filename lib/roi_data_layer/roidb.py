@@ -22,28 +22,46 @@ def prepare_roidb(imdb):
     each ground-truth box. The class with maximum overlap is also
     recorded.
     """
+
+    if DEBUG:
+        class_counter=0
+        total_counter=0
+
     sizes = [PIL.Image.open(imdb.image_path_at(i)).size
              for i in xrange(imdb.num_images)]
     roidb = imdb.roidb
     for i in xrange(len(imdb.image_index)):
-        roidb[i]['image'] = imdb.image_path_at(i)
-        roidb[i]['width'] = sizes[i][0]
-        roidb[i]['height'] = sizes[i][1]
-        # need gt_overlaps as a dense array for argmax
-        gt_overlaps = roidb[i]['gt_overlaps'].toarray()
-        # max overlap with gt over classes (columns)
-        max_overlaps = gt_overlaps.max(axis=1)
-        # gt class that had the max overlap
-        max_classes = gt_overlaps.argmax(axis=1)
-        roidb[i]['max_classes'] = max_classes
-        roidb[i]['max_overlaps'] = max_overlaps
-        # sanity checks
-        # max overlap of 0 => class should be zero (background)
-        zero_inds = np.where(max_overlaps == 0)[0]
-        assert all(max_classes[zero_inds] == 0)
-        # max overlap > 0 => class should not be zero (must be a fg class)
-        nonzero_inds = np.where(max_overlaps > 0)[0]
-        assert all(max_classes[nonzero_inds] != 0)
+
+        # only extract ROI for selected classes
+        indices_to_extract = [0,15]
+        roidb[i]['gt_overlaps'] = roidb[i]['gt_overlaps'][:,indices_to_extract]
+
+        if not all(roidb[i]['gt_overlaps'].toarray() == 0):
+
+            roidb[i]['image'] = imdb.image_path_at(i)
+            roidb[i]['width'] = sizes[i][0]
+            roidb[i]['height'] = sizes[i][1]
+
+            # need gt_overlaps as a dense array for argmax
+            gt_overlaps = roidb[i]['gt_overlaps'].toarray()
+            # max overlap with gt over classes (columns)
+            max_overlaps = gt_overlaps.max(axis=1)
+            # gt class that had the max overlap
+            max_classes = gt_overlaps.argmax(axis=1)
+            roidb[i]['max_classes'] = max_classes
+            roidb[i]['max_overlaps'] = max_overlaps
+            
+            # sanity checks
+            # max overlap of 0 => class should be zero (background)
+            zero_inds = np.where(max_overlaps == 0)[0]
+            assert all(max_classes[zero_inds] == 0)
+            # max overlap > 0 => class should not be zero (must be a fg class)
+            nonzero_inds = np.where(max_overlaps > 0)[0]
+            assert all(max_classes[nonzero_inds] != 0)        
+
+            if DEBUG:
+                total_counter+=1
+                if (1 in max_classes): class_counter+=1;print('DEBUG roidb prepare_roidb class_counter={}/{} roidb[i]["image"]={} max_classes={} max_overlaps={} gt_overlaps={}'.format(class_counter,total_counter,roidb[i]['image'],max_classes, max_overlaps, roidb[i]['gt_overlaps'].toarray() ))
 
 def add_bbox_regression_targets(roidb):
     """Add information needed to train bounding-box regressors."""
