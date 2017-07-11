@@ -31,7 +31,6 @@ def prepare_roidb(imdb):
              for i in xrange(imdb.num_images)]
     
     roidb = imdb.roidb
-    roidb_target = []
     indices_to_extract = [0,15]
 
     for i in xrange(len(imdb.image_index)):
@@ -59,15 +58,11 @@ def prepare_roidb(imdb):
         # max overlap > 0 => class should not be zero (must be a fg class)
         nonzero_inds = np.where(max_overlaps > 0)[0]
         assert all(max_classes[nonzero_inds] != 0)  
-        
-        if all(max_overlaps != 0):
-            roidb_target.append(roidb[i])      
 
         if DEBUG:
             total_counter+=1
             if (1 in max_classes): class_counter+=1;print('DEBUG roidb prepare_roidb class_counter={}/{} roidb[i]["image"]={} max_classes={} max_overlaps={} gt_overlaps={}'.format(class_counter,total_counter,roidb[i]['image'],max_classes, max_overlaps, roidb[i]['gt_overlaps'].toarray() ))
 
-    imdb.set_roidb(roidb_target)
 
 
 def add_bbox_regression_targets(roidb):
