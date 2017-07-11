@@ -13,9 +13,9 @@ from fast_rcnn.bbox_transform import bbox_transform
 from utils.cython_bbox import bbox_overlaps
 import PIL
 
-DEBUG = True
+DEBUG = False
 
-def prepare_roidb(imdb):
+def prepare_roidb(imdb,classes):
     """Enrich the imdb's roidb by adding some derived quantities that
     are useful for training. This function precomputes the maximum
     overlap, taken over ground-truth boxes, between each ROI and
@@ -31,7 +31,7 @@ def prepare_roidb(imdb):
              for i in xrange(imdb.num_images)]
     
     roidb = imdb.roidb
-    indices_to_extract = [0,15]
+    indices_to_extract = classes
 
     for i in xrange(len(imdb.image_index)):
 
