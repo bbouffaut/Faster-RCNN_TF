@@ -19,6 +19,8 @@ import sys
 from tensorflow.python.client import timeline
 import time
 
+DEBUG = True
+
 class SolverWrapper(object):
     """A simple wrapper around Caffe's solver.
     This wrapper gives us control over he snapshotting process, which we
@@ -85,6 +87,9 @@ class SolverWrapper(object):
 
         data_layer = get_data_layer(self.roidb, self.imdb.num_classes)
 
+        if DEBUG:
+            print('DEBUG DONE get_data_layer')
+
         # RPN
         # classification loss
         rpn_cls_score = tf.reshape(self.net.get_output('rpn_cls_score_reshape'),[-1,2])
@@ -140,6 +145,10 @@ class SolverWrapper(object):
         last_snapshot_iter = -1
         timer = Timer()
         for iter in range(max_iters):
+
+            if DEBUG:
+                print('DEBUG training iter loop {}'.format(iter))
+                
             # get one batch
             blobs = data_layer.forward()
 
