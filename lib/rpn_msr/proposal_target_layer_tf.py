@@ -22,7 +22,7 @@ def proposal_target_layer(rpn_rois, gt_boxes,_num_classes):
     """
 
     if DEBUG:
-        print('DEBUG proposal_target_layer num_classes={} rpn_rois_shape={} gt_boxes={}'.format(_num_classes,rpn_rois.shape,gt_boxes.shape))
+        print('DEBUG proposal_target_layer num_classes={} rpn_rois={} gt_boxes={}'.format(_num_classes,rpn_rois,gt_boxes))
 
     # Proposal ROIs (0, x1, y1, x2, y2) coming from RPN
     # (i.e., rpn.proposal_layer.ProposalLayer), or any other source
@@ -125,6 +125,11 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
     """Generate a random sample of RoIs comprising foreground and background
     examples.
     """
+
+    if DEBUG:
+	interesting_rois = [roi for roi in all_rois if roi[0] > 0]
+	print('DEBUG _sample_rois all_rois={}'.format(interesting_rois))
+
     # overlaps: (rois x gt_boxes)
     overlaps = bbox_overlaps(
         np.ascontiguousarray(all_rois[:, 1:5], dtype=np.float),

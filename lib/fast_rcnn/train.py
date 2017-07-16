@@ -151,6 +151,9 @@ class SolverWrapper(object):
                 
             # get one batch
             blobs = data_layer.forward()
+            
+	    if DEBUG:
+                print('DEBUG training iter loop blobs[data].shape={} im_info={}'.format(blobs['data'].shape,blobs['im_info']))
 
             # Make one SGD update
             feed_dict={self.net.data: blobs['data'], self.net.im_info: blobs['im_info'], self.net.keep_prob: 0.5, \
