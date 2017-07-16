@@ -33,7 +33,7 @@ def get_minibatch(roidb, num_classes):
     blobs = {'data': im_blob}
 
     if DEBUG:
-        print('DEBUG minibatch.get_minibatch() num_classes={} cfg.TRAIN.HAS_RPN={}'.format(num_classes,cfg.TRAIN.HAS_RPN))
+        print('DEBUG minibatch.get_minibatch() num_classes={} num_images={} cfg.TRAIN.HAS_RPN={} roidb[0]["gt_classes"]={}'.format(num_classes,num_images,cfg.TRAIN.HAS_RPN,roidb[0]['gt_classes']))
 
     if cfg.TRAIN.HAS_RPN:
         assert len(im_scales) == 1, "Single batch only"

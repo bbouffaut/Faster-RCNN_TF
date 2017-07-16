@@ -20,6 +20,8 @@ from voc_eval import voc_eval
 from fast_rcnn.config import cfg
 import pdb
 
+DEBUG = True
+
 
 class pascal_voc(imdb):
     def __init__(self, image_set, year, classes=None, devkit_path=None):
