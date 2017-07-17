@@ -8,3 +8,4 @@ data/cache
 data/pretrain_model
 data/VOCdevkit2007
 debug.*
+experiments/logs/
