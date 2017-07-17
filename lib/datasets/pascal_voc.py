@@ -117,7 +117,7 @@ class pascal_voc(imdb):
 
         # Load only images that has classes in configured classes
         gt_roidb = [self._load_pascal_annotation(index)
-                    for index in self.image_index if self._load_pascal_annotation(index) != None ]
+                    for index in self.image_index ]
         with open(cache_file, 'wb') as fid:
             cPickle.dump(gt_roidb, fid, cPickle.HIGHEST_PROTOCOL)
         print 'wrote gt roidb to {}'.format(cache_file)
@@ -190,6 +190,18 @@ class pascal_voc(imdb):
 
         return self.create_roidb_from_box_list(box_list, gt_roidb)
 
+    def _count_objects_that_match_classes(self,objs):
+        class_counter = 0
+        for ix, obj in enumerate(objs):
+
+            cls_name = obj.find('name').text.lower().strip()
+
+            #Load only regions that match one of the configured classes
+            if (cls_name in self._classes):
+		class_counter += 1
+	return class_counter
+ 
+
     def _load_pascal_annotation(self, index):
         """
         Load image and bounding boxes info from XML file in the PASCAL VOC
@@ -206,52 +218,56 @@ class pascal_voc(imdb):
             #     print 'Removed {} difficult objects'.format(
             #         len(objs) - len(non_diff_objs))
             objs = non_diff_objs
-        num_objs = len(objs)
+        
+	# count the number of relevant objects regarding specified classes
+	num_objs = self._count_objects_that_match_classes(objs) 
+	if DEBUG:
+		print('_count_objects_that_match_classes num_objs={}'.format(num_objs))
+	
+	# return None if there is no object => image is not relevant
+	if (num_objs > 0):
+	        boxes = np.zeros((num_objs, 4), dtype=np.uint16)
+       		gt_classes = np.zeros((num_objs), dtype=np.int32)
+	        overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
+        	# "Seg" area for pascal is just the box area
+        	seg_areas = np.zeros((num_objs), dtype=np.float32)
 
-        boxes = np.zeros(dtype=np.uint16)
-        gt_classes = np.zeros((num_objs), dtype=np.int32)
-        overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
-        # "Seg" area for pascal is just the box area
-        seg_areas = np.zeros((num_objs), dtype=np.float32)
+        	# Load object bounding boxes into a data frame.
+        	class_counter = 0
+	        for ix, obj in enumerate(objs):
+        	    cls_name = obj.find('name').text.lower().strip()
+	            #Load only regions that match one of the configured classes
+	            if (cls_name in self._classes):
+	                bbox = obj.find('bndbox')
+	                # Make pixel indexes 0-based
+	                x1 = float(bbox.find('xmin').text) - 1
+	                y1 = float(bbox.find('ymin').text) - 1
+	                x2 = float(bbox.find('xmax').text) - 1
+	                y2 = float(bbox.find('ymax').text) - 1
+	                cls = self._class_to_ind[cls_name]
 
-        # Load object bounding boxes into a data frame.
-        class_counter = 0
-        for ix, obj in enumerate(objs):
+	                boxes[class_counter, :] = [x1, y1, x2, y2]
+	                gt_classes[class_counter] = cls
+	                overlaps[class_counter, cls] = 1.0
+	                seg_areas[class_counter] = (x2 - x1 + 1) * (y2 - y1 + 1)
+	                class_counter += 1
+	                if DEBUG:
+	                    print('DEBUG _load_pascal_annotation class={} class_counter={}'.format(cls,class_counter))
 
-            cls_name = obj.find('name').text.lower().strip()
-
-            #Load only regions that match one of the configured classes
-            if (cls_name in self._classes):
-                bbox = obj.find('bndbox')
-                # Make pixel indexes 0-based
-                x1 = float(bbox.find('xmin').text) - 1
-                y1 = float(bbox.find('ymin').text) - 1
-                x2 = float(bbox.find('xmax').text) - 1
-                y2 = float(bbox.find('ymax').text) - 1
-                cls = self._class_to_ind[cls_name]
-
-                boxes[class_counter, :] = [x1, y1, x2, y2]
-                gt_classes[class_counter] = cls
-                overlaps[class_counter, cls] = 1.0
-                seg_areas[class_counter] = (x2 - x1 + 1) * (y2 - y1 + 1)
-                class_counter += 1
-                if DEBUG:
-                    print('DEBUG _load_pascal_annotation class={} class_counter={}'.format(cls,class_counter))
-
-        overlaps = scipy.sparse.csr_matrix(overlaps)
-
-        if (len([ n_b for n_b in boxes if n_b != 0 ]) > 0):
-            if DEBUG:
-                print('DEBUG _load_pascal_annotation ROI class={} found in image {}'.format(class_counter,index))
-            return {'boxes' : boxes,
-                'gt_classes': gt_classes,
-                'gt_overlaps' : overlaps,
-                'flipped' : False,
-                'seg_areas' : seg_areas}
-        else:
-            if DEBUG:
-                print('DEBUG _load_pascal_annotation no ROI in image {}'.format(index))
-            return None
+        	overlaps = scipy.sparse.csr_matrix(overlaps)
+		
+		if DEBUG:
+                	print('DEBUG _load_pascal_annotation ROI class={} found in image {}'.format(class_counter,index))
+	        
+		return {'boxes' : boxes,
+                	'gt_classes': gt_classes,
+	                'gt_overlaps' : overlaps,
+	                'flipped' : False,
+	                'seg_areas' : seg_areas}
+	else:
+		if DEBUG:
+                	print('DEBUG _load_pascal_annotation no ROI in image {}'.format(index))
+		return None
 
     def _get_comp_id(self):
         comp_id = (self._comp_id + '_' + self._salt if self.config['use_salt']

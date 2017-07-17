@@ -78,6 +78,7 @@ class imdb(object):
 
     @property
     def num_images(self):
+      
       return len(self.image_index)
 
     def image_path_at(self, i):
@@ -105,18 +106,19 @@ class imdb(object):
         num_images = self.num_images
         widths = self._get_widths()
         for i in xrange(num_images):
-            boxes = self.roidb[i]['boxes'].copy()
-            oldx1 = boxes[:, 0].copy()
-            oldx2 = boxes[:, 2].copy()
-            boxes[:, 0] = widths[i] - oldx2 - 1
-            boxes[:, 2] = widths[i] - oldx1 - 1
-            assert (boxes[:, 2] >= boxes[:, 0]).all()
-            entry = {'boxes' : boxes,
-                     'gt_overlaps' : self.roidb[i]['gt_overlaps'],
-                     'gt_classes' : self.roidb[i]['gt_classes'],
-                     'flipped' : True}
-            self.roidb.append(entry)
-        self._image_index = self._image_index * 2
+	    if self.roidb[i] != None :
+	            boxes = self.roidb[i]['boxes'].copy()
+        	    oldx1 = boxes[:, 0].copy()
+	            oldx2 = boxes[:, 2].copy()
+	            boxes[:, 0] = widths[i] - oldx2 - 1
+	            boxes[:, 2] = widths[i] - oldx1 - 1
+	            assert (boxes[:, 2] >= boxes[:, 0]).all()
+	            entry = {'boxes' : boxes,
+        	             'gt_overlaps' : self.roidb[i]['gt_overlaps'],
+	                     'gt_classes' : self.roidb[i]['gt_classes'],
+	                     'flipped' : True}
+        	    self.roidb.append(entry)
+             self._image_index = self._image_index * 2
 
     def evaluate_recall(self, candidate_boxes=None, thresholds=None,
                         area='all', limit=None):
@@ -147,53 +149,54 @@ class imdb(object):
         gt_overlaps = np.zeros(0)
         num_pos = 0
         for i in xrange(self.num_images):
-            # Checking for max_overlaps == 1 avoids including crowd annotations
-            # (...pretty hacking :/)
-            max_gt_overlaps = self.roidb[i]['gt_overlaps'].toarray().max(axis=1)
-            gt_inds = np.where((self.roidb[i]['gt_classes'] > 0) &
-                               (max_gt_overlaps == 1))[0]
-            gt_boxes = self.roidb[i]['boxes'][gt_inds, :]
-            gt_areas = self.roidb[i]['seg_areas'][gt_inds]
-            valid_gt_inds = np.where((gt_areas >= area_range[0]) &
-                                     (gt_areas <= area_range[1]))[0]
-            gt_boxes = gt_boxes[valid_gt_inds, :]
-            num_pos += len(valid_gt_inds)
+	    if self.roidb[i] != None:
+	            # Checking for max_overlaps == 1 avoids including crowd annotations
+        	    # (...pretty hacking :/)
+	            max_gt_overlaps = self.roidb[i]['gt_overlaps'].toarray().max(axis=1)
+	            gt_inds = np.where((self.roidb[i]['gt_classes'] > 0) &
+        	                       (max_gt_overlaps == 1))[0]
+	            gt_boxes = self.roidb[i]['boxes'][gt_inds, :]
+	            gt_areas = self.roidb[i]['seg_areas'][gt_inds]
+	            valid_gt_inds = np.where((gt_areas >= area_range[0]) &
+        	                             (gt_areas <= area_range[1]))[0]
+	            gt_boxes = gt_boxes[valid_gt_inds, :]
+	            num_pos += len(valid_gt_inds)
 
-            if candidate_boxes is None:
-                # If candidate_boxes is not supplied, the default is to use the
-                # non-ground-truth boxes from this roidb
-                non_gt_inds = np.where(self.roidb[i]['gt_classes'] == 0)[0]
-                boxes = self.roidb[i]['boxes'][non_gt_inds, :]
-            else:
-                boxes = candidate_boxes[i]
-            if boxes.shape[0] == 0:
-                continue
-            if limit is not None and boxes.shape[0] > limit:
-                boxes = boxes[:limit, :]
+        	    if candidate_boxes is None:
+	                # If candidate_boxes is not supplied, the default is to use the
+	                # non-ground-truth boxes from this roidb
+	                non_gt_inds = np.where(self.roidb[i]['gt_classes'] == 0)[0]
+	                boxes = self.roidb[i]['boxes'][non_gt_inds, :]
+	            else:
+        	        boxes = candidate_boxes[i]
+	            if boxes.shape[0] == 0:
+        	        continue
+	            if limit is not None and boxes.shape[0] > limit:
+	                boxes = boxes[:limit, :]
 
-            overlaps = bbox_overlaps(boxes.astype(np.float),
+        	    overlaps = bbox_overlaps(boxes.astype(np.float),
                                      gt_boxes.astype(np.float))
 
-            _gt_overlaps = np.zeros((gt_boxes.shape[0]))
-            for j in xrange(gt_boxes.shape[0]):
-                # find which proposal box maximally covers each gt box
-                argmax_overlaps = overlaps.argmax(axis=0)
-                # and get the iou amount of coverage for each gt box
-                max_overlaps = overlaps.max(axis=0)
-                # find which gt box is 'best' covered (i.e. 'best' = most iou)
-                gt_ind = max_overlaps.argmax()
-                gt_ovr = max_overlaps.max()
-                assert(gt_ovr >= 0)
-                # find the proposal box that covers the best covered gt box
-                box_ind = argmax_overlaps[gt_ind]
-                # record the iou coverage of this gt box
-                _gt_overlaps[j] = overlaps[box_ind, gt_ind]
-                assert(_gt_overlaps[j] == gt_ovr)
-                # mark the proposal box and the gt box as used
-                overlaps[box_ind, :] = -1
-                overlaps[:, gt_ind] = -1
-            # append recorded iou coverage level
-            gt_overlaps = np.hstack((gt_overlaps, _gt_overlaps))
+	            _gt_overlaps = np.zeros((gt_boxes.shape[0]))
+        	    for j in xrange(gt_boxes.shape[0]):
+	                # find which proposal box maximally covers each gt box
+	                argmax_overlaps = overlaps.argmax(axis=0)
+	                # and get the iou amount of coverage for each gt box
+	                max_overlaps = overlaps.max(axis=0)
+	                # find which gt box is 'best' covered (i.e. 'best' = most iou)
+	                gt_ind = max_overlaps.argmax()
+	                gt_ovr = max_overlaps.max()
+	                assert(gt_ovr >= 0)
+	                # find the proposal box that covers the best covered gt box
+	                box_ind = argmax_overlaps[gt_ind]
+	                # record the iou coverage of this gt box
+	                _gt_overlaps[j] = overlaps[box_ind, gt_ind]
+	                assert(_gt_overlaps[j] == gt_ovr)
+	                # mark the proposal box and the gt box as used
+	                overlaps[box_ind, :] = -1
+	                overlaps[:, gt_ind] = -1
+	            # append recorded iou coverage level
+	            gt_overlaps = np.hstack((gt_overlaps, _gt_overlaps))
 
         gt_overlaps = np.sort(gt_overlaps)
         if thresholds is None:

@@ -34,55 +34,58 @@ def prepare_roidb(imdb,classes):
     indices_to_extract = classes
 
     for i in xrange(len(imdb.image_index)):
+	if roidb[i] != None:
 
-        # only extract ROI for selected classes
-        roidb[i]['gt_overlaps'] = roidb[i]['gt_overlaps'][:,indices_to_extract]
+	        # only extract ROI for selected classes
+	        roidb[i]['gt_overlaps'] = roidb[i]['gt_overlaps'][:,indices_to_extract]
 
-        roidb[i]['image'] = imdb.image_path_at(i)
-        roidb[i]['width'] = sizes[i][0]
-        roidb[i]['height'] = sizes[i][1]
+	        roidb[i]['image'] = imdb.image_path_at(i)
+	        roidb[i]['width'] = sizes[i][0]
+	        roidb[i]['height'] = sizes[i][1]
 
-        # need gt_overlaps as a dense array for argmax
-        gt_overlaps = roidb[i]['gt_overlaps'].toarray()
-        # max overlap with gt over classes (columns)
-        max_overlaps = gt_overlaps.max(axis=1)
-        # gt class that had the max overlap
-        max_classes = gt_overlaps.argmax(axis=1)
-        roidb[i]['max_classes'] = max_classes
-        roidb[i]['max_overlaps'] = max_overlaps
+	        # need gt_overlaps as a dense array for argmax
+	        gt_overlaps = roidb[i]['gt_overlaps'].toarray()
+	        # max overlap with gt over classes (columns)
+	        max_overlaps = gt_overlaps.max(axis=1)
+	        # gt class that had the max overlap
+	        max_classes = gt_overlaps.argmax(axis=1)
+	        roidb[i]['max_classes'] = max_classes
+	        roidb[i]['max_overlaps'] = max_overlaps
         
-        # sanity checks
-        # max overlap of 0 => class should be zero (background)
-        zero_inds = np.where(max_overlaps == 0)[0]
-        assert all(max_classes[zero_inds] == 0)
-        # max overlap > 0 => class should not be zero (must be a fg class)
-        nonzero_inds = np.where(max_overlaps > 0)[0]
-        assert all(max_classes[nonzero_inds] != 0)  
+	        # sanity checks
+	        # max overlap of 0 => class should be zero (background)
+	        zero_inds = np.where(max_overlaps == 0)[0]
+	        assert all(max_classes[zero_inds] == 0)
+	        # max overlap > 0 => class should not be zero (must be a fg class)
+	        nonzero_inds = np.where(max_overlaps > 0)[0]
+	        assert all(max_classes[nonzero_inds] != 0)  
 
-        if DEBUG:
-            total_counter+=1
-            if (1 in max_classes): class_counter+=1;print('DEBUG roidb prepare_roidb class_counter={}/{} roidb[i]["image"]={} max_classes={} max_overlaps={} gt_overlaps={}'.format(class_counter,total_counter,roidb[i]['image'],max_classes, max_overlaps, roidb[i]['gt_overlaps'].toarray() ))
+	        if DEBUG:
+	            total_counter+=1
+	            if (1 in max_classes): class_counter+=1;print('DEBUG roidb prepare_roidb class_counter={}/{} roidb[i]["image"]={} max_classes={} max_overlaps={} gt_overlaps={}'.format(class_counter,total_counter,roidb[i]['image'],max_classes, max_overlaps, roidb[i]['gt_overlaps'].toarray() ))
 
 
 
 def add_bbox_regression_targets(roidb):
     """Add information needed to train bounding-box regressors."""
+    min_index = [ i for i,value in enumerate(roidb) if value != None][0]
     assert len(roidb) > 0
-    assert 'max_classes' in roidb[0], 'Did you call prepare_roidb first?'
+    assert 'max_classes' in roidb[min_index], 'Did you call prepare_roidb first?'
 
     num_images = len(roidb)
     # Infer number of classes from the number of columns in gt_overlaps
-    num_classes = roidb[0]['gt_overlaps'].shape[1]
+    num_classes = roidb[min_index]['gt_overlaps'].shape[1]
 
     if DEBUG:
         print('DEBUG roidb add_bbox_regression_targets num_classes={}'.format(num_classes))
 
     for im_i in xrange(num_images):
-        rois = roidb[im_i]['boxes']
-        max_overlaps = roidb[im_i]['max_overlaps']
-        max_classes = roidb[im_i]['max_classes']
-        roidb[im_i]['bbox_targets'] = \
-                _compute_targets(rois, max_overlaps, max_classes)
+	if roidb[im_i] != None:
+	        rois = roidb[im_i]['boxes']
+	        max_overlaps = roidb[im_i]['max_overlaps']
+	        max_classes = roidb[im_i]['max_classes']
+	        roidb[im_i]['bbox_targets'] = \
+        	        _compute_targets(rois, max_overlaps, max_classes)
 
     if cfg.TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED:
         # Use fixed / precomputed "means" and "stds" instead of empirical values
@@ -97,17 +100,17 @@ def add_bbox_regression_targets(roidb):
         sums = np.zeros((num_classes, 4))
         squared_sums = np.zeros((num_classes, 4))
         for im_i in xrange(num_images):
-            targets = roidb[im_i]['bbox_targets']
-            for cls in xrange(1, num_classes):
-                cls_inds = np.where(targets[:, 0] == cls)[0]
-                if cls_inds.size > 0:
-                    class_counts[cls] += cls_inds.size
-                    sums[cls, :] += targets[cls_inds, 1:].sum(axis=0)
-                    squared_sums[cls, :] += \
-                            (targets[cls_inds, 1:] ** 2).sum(axis=0)
-
-        means = sums / class_counts
-        stds = np.sqrt(squared_sums / class_counts - means ** 2)
+	    if roidb[im_i] != None:
+	            targets = roidb[im_i]['bbox_targets']
+        	    for cls in xrange(1, num_classes):
+                	cls_inds = np.where(targets[:, 0] == cls)[0]
+	                if cls_inds.size > 0:
+        	            class_counts[cls] += cls_inds.size
+                	    sums[cls, :] += targets[cls_inds, 1:].sum(axis=0)
+	       	            squared_sums[cls, :] += \
+        	                    (targets[cls_inds, 1:] ** 2).sum(axis=0)
+	means = sums / class_counts
+	stds = np.sqrt(squared_sums / class_counts - means ** 2)
 
     print 'bbox target means:'
     print means
@@ -120,11 +123,12 @@ def add_bbox_regression_targets(roidb):
     if cfg.TRAIN.BBOX_NORMALIZE_TARGETS:
         print "Normalizing targets"
         for im_i in xrange(num_images):
-            targets = roidb[im_i]['bbox_targets']
-            for cls in xrange(1, num_classes):
-                cls_inds = np.where(targets[:, 0] == cls)[0]
-                roidb[im_i]['bbox_targets'][cls_inds, 1:] -= means[cls, :]
-                roidb[im_i]['bbox_targets'][cls_inds, 1:] /= stds[cls, :]
+	    if roidb[im_i] != None:
+	            targets = roidb[im_i]['bbox_targets']
+        	    for cls in xrange(1, num_classes):
+                	cls_inds = np.where(targets[:, 0] == cls)[0]
+	                roidb[im_i]['bbox_targets'][cls_inds, 1:] -= means[cls, :]
+	                roidb[im_i]['bbox_targets'][cls_inds, 1:] /= stds[cls, :]
     else:
         print "NOT normalizing targets"
 
