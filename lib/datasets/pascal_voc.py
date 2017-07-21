@@ -88,13 +88,17 @@ class pascal_voc(imdb):
         """
         # Example path to image set file:
         # self._devkit_path + /VOCdevkit2007/VOC2007/ImageSets/Main/val.txt
-        image_set_file = os.path.join(self._data_path, 'ImageSets', 'Main',
-                                      self._image_set + '.txt')
-        assert os.path.exists(image_set_file), \
-                'Path does not exist: {}'.format(image_set_file)
-        with open(image_set_file) as f:
-            image_index = [x.strip() for x in f.readlines()]
-        return image_index
+        image_index = []
+        for cl in [ cla for cla in self._classes if ( cla != '__background__')]:
+            image_set_file = os.path.join(self._data_path, 'ImageSets', 'Main', cl + '_' + self._image_set + '.txt')
+            assert os.path.exists(image_set_file), 'Path does not exist: {}'.format(image_set_file)
+            with open(image_set_file) as f:
+                for line in f.readlines():
+                    line_content = [ n for n in line.strip().split(' ') if n ]
+                    if line_content[1] > 0:
+                        image_index.append(line_content[0])
+
+        return list(set(image_index))
 
     def _get_default_path(self):
         """
@@ -190,6 +194,16 @@ class pascal_voc(imdb):
 
         return self.create_roidb_from_box_list(box_list, gt_roidb)
 
+    def _get_objs_for_selected_classes(self, objs):
+        target_objs = []
+        for ix, obj in enumerate(objs):
+            cls_name = obj.find('name').text.lower().strip()
+            if (cls_name in self._classes):
+                target_objs.append(obj)
+
+        return target_objs
+
+
     def _load_pascal_annotation(self, index):
         """
         Load image and bounding boxes info from XML file in the PASCAL VOC
@@ -206,16 +220,17 @@ class pascal_voc(imdb):
             #     print 'Removed {} difficult objects'.format(
             #         len(objs) - len(non_diff_objs))
             objs = non_diff_objs
+        
+        objs = self._get_objs_for_selected_classes(objs)
         num_objs = len(objs)
 
-        boxes = np.zeros(dtype=np.uint16)
+        boxes = np.zeros((num_objs, 4), dtype=np.uint16)
         gt_classes = np.zeros((num_objs), dtype=np.int32)
         overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
         # "Seg" area for pascal is just the box area
         seg_areas = np.zeros((num_objs), dtype=np.float32)
 
         # Load object bounding boxes into a data frame.
-        class_counter = 0
         for ix, obj in enumerate(objs):
 
             cls_name = obj.find('name').text.lower().strip()
@@ -230,28 +245,25 @@ class pascal_voc(imdb):
                 y2 = float(bbox.find('ymax').text) - 1
                 cls = self._class_to_ind[cls_name]
 
-                boxes[class_counter, :] = [x1, y1, x2, y2]
-                gt_classes[class_counter] = cls
-                overlaps[class_counter, cls] = 1.0
-                seg_areas[class_counter] = (x2 - x1 + 1) * (y2 - y1 + 1)
-                class_counter += 1
+                boxes[ix, :] = [x1, y1, x2, y2]
+                gt_classes[ix] = cls
+                overlaps[ix, cls] = 1.0
+                seg_areas[ix] = (x2 - x1 + 1) * (y2 - y1 + 1)
+
                 if DEBUG:
-                    print('DEBUG _load_pascal_annotation class={} class_counter={}'.format(cls,class_counter))
+                    print('DEBUG _load_pascal_annotation class={} class_counter={} boxes={}'.format(cls,class_counter,boxes))
 
         overlaps = scipy.sparse.csr_matrix(overlaps)
+        
+        if DEBUG:
+            print('DEBUG _load_pascal_annotation ROI class={} found in image {}'.format(class_counter,index))
+        
+        return {'boxes' : boxes,
+            'gt_classes': gt_classes,
+            'gt_overlaps' : overlaps,
+            'flipped' : False,
+            'seg_areas' : seg_areas}
 
-        if (len([ n_b for n_b in boxes if n_b != 0 ]) > 0):
-            if DEBUG:
-                print('DEBUG _load_pascal_annotation ROI class={} found in image {}'.format(class_counter,index))
-            return {'boxes' : boxes,
-                'gt_classes': gt_classes,
-                'gt_overlaps' : overlaps,
-                'flipped' : False,
-                'seg_areas' : seg_areas}
-        else:
-            if DEBUG:
-                print('DEBUG _load_pascal_annotation no ROI in image {}'.format(index))
-            return None
 
     def _get_comp_id(self):
         comp_id = (self._comp_id + '_' + self._salt if self.config['use_salt']
