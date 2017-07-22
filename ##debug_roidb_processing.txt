@@ -1,0 +1,29 @@
+## roidb path in the algorythm
+
+train_net.py:get_training_roidb()
+-> fast_rcnn/train.py:get_training_roidb()
+-> roi_data_layer/roidb.py:prepare_roidb()
+-> imdb.roidb is set
+
+train_net.py:get_network()
+-> network/factory.py:get_network()
+-> network/VGGnet_train.py:setup()
+
+## Load ROIs Data
+fast_rcnn/train.py:train_net(imdb,roidb...)
+-> SolverWrapper(imdb,roidb...):_init()
+-> roi_data_layer/roidb.py:add_bbox_regression_targets(roidb)
+	-> roidb[im_i]['bbox_targets'] = _compute_targets(roidb[im_i]['boxes'],max_overlaps,max_classes)
+	-> compute_targets(roidb)
+-> fast_rcnn/bbox_transform.py:bbox_transform()
+
+## Start training
+-> SolverWrapper.train_model()
+-> get_data_layer()
+-> roi_data_layer:RoIDataLayer._init(roidb)
+
+## TRAINING LOOP
+fast_rcnn/train.py:train_model()
+-> blobs = data_layer.forward()
+-> roi_data_layer/minibatch.py:get_minibatch()
+-> _sample_rois()
