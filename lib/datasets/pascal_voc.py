@@ -115,13 +115,21 @@ class pascal_voc(imdb):
         """
         return os.path.join(cfg.DATA_DIR, 'VOCdevkit' + self._year)
 
+    
+    def _build_roidb_cache_filename(self):
+        filename = "_".join(cl for cl in self._classes if cl != '__background__')
+        return filename
+
+
     def gt_roidb(self):
         """
         Return the database of ground-truth regions of interest.
 
         This function loads/saves from/to a cache file to speed up future calls.
         """
-        cache_file = os.path.join(self.cache_path, self.name + '_gt_roidb.pkl')
+
+
+        cache_file = os.path.join(self.cache_path, self.name + '_' + self._build_roidb_cache_filename() + '_gt_roidb.pkl')
         if os.path.exists(cache_file):
             with open(cache_file, 'rb') as fid:
                 roidb = cPickle.load(fid)
