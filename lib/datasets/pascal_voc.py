@@ -93,12 +93,21 @@ class pascal_voc(imdb):
             image_set_file = os.path.join(self._data_path, 'ImageSets', 'Main', cl + '_' + self._image_set + '.txt')
             assert os.path.exists(image_set_file), 'Path does not exist: {}'.format(image_set_file)
             with open(image_set_file) as f:
+
                 for line in f.readlines():
                     line_content = [ n for n in line.strip().split(' ') if n ]
-                    if line_content[1] > 0:
+                    if int(line_content[1]) > 0:
                         image_index.append(line_content[0])
 
-        return list(set(image_index))
+                        if DEBUG:
+                            print('DEBUG _load_image_set_index image_index={}'.format(line_content))
+
+        non_duplicate_list = list(set(image_index))
+
+        if DEBUG:
+            print('DEBUG READ File={} nb_images={}'.format(image_set_file,len(non_duplicate_list)))
+
+        return non_duplicate_list
 
     def _get_default_path(self):
         """
@@ -120,8 +129,7 @@ class pascal_voc(imdb):
             return roidb
 
         # Load only images that has classes in configured classes
-        gt_roidb = [self._load_pascal_annotation(index)
-                    for index in self.image_index if self._load_pascal_annotation(index) != None ]
+        gt_roidb = [self._load_pascal_annotation(index) for index in self.image_index ]
         with open(cache_file, 'wb') as fid:
             cPickle.dump(gt_roidb, fid, cPickle.HIGHEST_PROTOCOL)
         print 'wrote gt roidb to {}'.format(cache_file)
@@ -235,7 +243,7 @@ class pascal_voc(imdb):
 
             cls_name = obj.find('name').text.lower().strip()
 
-            #Load only regions that match one of the configured classes
+            #Load only regions that match one of the configured classes => other case should not appear because we have selected objs that contains selected classes only
             if (cls_name in self._classes):
                 bbox = obj.find('bndbox')
                 # Make pixel indexes 0-based
@@ -250,13 +258,13 @@ class pascal_voc(imdb):
                 overlaps[ix, cls] = 1.0
                 seg_areas[ix] = (x2 - x1 + 1) * (y2 - y1 + 1)
 
-                if DEBUG:
-                    print('DEBUG _load_pascal_annotation class={} class_counter={} boxes={}'.format(cls,class_counter,boxes))
+                '''if DEBUG:
+                    print('DEBUG _load_pascal_annotation class={} class_counter={} boxes={}'.format(cls,ix,boxes))'''
 
         overlaps = scipy.sparse.csr_matrix(overlaps)
         
         if DEBUG:
-            print('DEBUG _load_pascal_annotation ROI class={} found in image {}'.format(class_counter,index))
+            print('DEBUG _load_pascal_annotation ROI class={} found in image {}'.format(len(boxes),index))
         
         return {'boxes' : boxes,
             'gt_classes': gt_classes,
