@@ -13,7 +13,7 @@ from fast_rcnn.bbox_transform import bbox_transform
 from utils.cython_bbox import bbox_overlaps
 import pdb
 
-DEBUG = True
+DEBUG = False
 
 def proposal_target_layer(rpn_rois, gt_boxes,_num_classes):
     """
@@ -127,8 +127,8 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
     """
 
     if DEBUG:
-	interesting_rois = [roi for roi in all_rois if roi[0] > 0]
-	print('DEBUG _sample_rois all_rois={}'.format(interesting_rois))
+    	interesting_rois = [roi for roi in all_rois if roi[0] > 0]
+    	print('DEBUG _sample_rois all_rois={}'.format(interesting_rois))
 
     # overlaps: (rois x gt_boxes)
     overlaps = bbox_overlaps(
