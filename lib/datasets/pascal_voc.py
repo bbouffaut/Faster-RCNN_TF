@@ -99,8 +99,8 @@ class pascal_voc(imdb):
                     if int(line_content[1]) > 0:
                         image_index.append(line_content[0])
 
-                        if DEBUG:
-                            print('DEBUG _load_image_set_index image_index={}'.format(line_content))
+                        '''if DEBUG:
+                            print('DEBUG _load_image_set_index image_index={}'.format(line_content))'''
 
         non_duplicate_list = list(set(image_index))
 
@@ -263,8 +263,8 @@ class pascal_voc(imdb):
 
         overlaps = scipy.sparse.csr_matrix(overlaps)
         
-        if DEBUG:
-            print('DEBUG _load_pascal_annotation ROI class={} found in image {}'.format(len(boxes),index))
+        '''if DEBUG:
+            print('DEBUG _load_pascal_annotation ROI class={} found in image {}'.format(len(boxes),index))'''
         
         return {'boxes' : boxes,
             'gt_classes': gt_classes,
