@@ -5,6 +5,7 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
+from __future__ import print_function
 from fast_rcnn.config import cfg
 from utils.blob import im_list_to_blob
 from utils.timer import Timer
@@ -98,7 +99,7 @@ def imdb_proposals(net, imdb):
         _t.tic()
         imdb_boxes[i], scores = im_proposals(net, im)
         _t.toc()
-        print 'im_proposals: {:d}/{:d} {:.3f}s' \
+        print('im_proposals: {:d}/{:d} {:.3f}s')\
               .format(i + 1, imdb.num_images, _t.average_time)
         if 0:
             dets = np.hstack((imdb_boxes[i], scores))
@@ -118,7 +119,7 @@ def imdb_proposals_det(net, imdb):
         _t.tic()
         boxes, scores = im_proposals(net, im)
         _t.toc()
-        print 'im_proposals: {:d}/{:d} {:.3f}s' \
+        print('im_proposals: {:d}/{:d} {:.3f}s')\
               .format(i + 1, imdb.num_images, _t.average_time)
         dets = np.hstack((boxes, scores))
         imdb_boxes[i] = dets

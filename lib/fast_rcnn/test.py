@@ -1,3 +1,4 @@
+from __future__ import print_function
 from fast_rcnn.config import cfg, get_output_dir
 import argparse
 from utils.timer import Timer
@@ -5,7 +6,7 @@ import numpy as np
 import cv2
 from utils.cython_nms import nms, nms_new
 from utils.boxes_grid import get_boxes_grid
-import cPickle
+import _pickle as cPickle
 import heapq
 from utils.blob import im_list_to_blob
 import os
@@ -333,7 +334,7 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300, thresh=0.05,
                     all_boxes[j][i] = all_boxes[j][i][keep, :]
         _t['misc'].toc()
 
-        print 'im_detect: {:d}/{:d} {:.3f}s {:.3f}s' \
+        print('im_detect: {:d}/{:d} {:.3f}s {:.3f}s') \
               .format(i + 1, num_images, _t['im_detect'].average_time,
                       _t['misc'].average_time)
 
@@ -341,6 +342,6 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300, thresh=0.05,
     with open(det_file, 'wb') as f:
         cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
 
-    print 'Evaluating detections'
+    print('Evaluating detections')
     imdb.evaluate_detections(all_boxes, output_dir)
 

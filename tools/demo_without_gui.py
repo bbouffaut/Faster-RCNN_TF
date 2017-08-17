@@ -1,3 +1,4 @@
+from __future__ import print_function
 import _init_paths
 import tensorflow as tf
 from fast_rcnn.config import cfg
@@ -10,15 +11,15 @@ import argparse
 from networks.factory import get_network
 
 
-'''CLASSES = ('__background__',
+CLASSES = ('__background__',
            'aeroplane', 'bicycle', 'bird', 'boat',
            'bottle', 'bus', 'car', 'cat', 'chair',
            'cow', 'diningtable', 'dog', 'horse',
            'motorbike', 'person', 'pottedplant',
-           'sheep', 'sofa', 'train', 'tvmonitor')'''
+           'sheep', 'sofa', 'train', 'tvmonitor')
 
 
-CLASSES = ('__background__','person','cat')
+'''CLASSES = ('__background__','person','cat')'''
 
 def vis_detections(im, class_name, dets, thresh=0.5):
     """Draw detected bounding boxes."""
@@ -29,7 +30,7 @@ def vis_detections(im, class_name, dets, thresh=0.5):
     for i in inds:
         bbox = dets[i, :4]
         score = dets[i, -1]
-	print(class_name,score)
+        print(class_name,score)
 
      
 def demo(sess, net, image_name):
@@ -58,7 +59,7 @@ def demo(sess, net, image_name):
                           cls_scores[:, np.newaxis])).astype(np.float32)
         keep = nms(dets, NMS_THRESH)
         dets = dets[keep, :]
-	vis_detections(im,cls,dets, thresh=CONF_THRESH)
+        vis_detections(im,cls,dets, thresh=CONF_THRESH)
 
 def parse_args():
     """Parse input arguments."""
@@ -93,10 +94,10 @@ if __name__ == '__main__':
     saver.restore(sess, args.model)
     #sess.run(tf.initialize_all_variables())
 
-    print '\n\nLoaded network {:s}'.format(args.model)
+    print ('\n\nLoaded network {:s}').format(args.model)
     
 
-    print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    print 'Demo for {}'.format(args.image_name)
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    print ('Demo for {}').format(args.image_name)
     demo(sess, net, args.image_name)
 

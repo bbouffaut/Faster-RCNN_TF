@@ -7,6 +7,7 @@
 
 """Train a Fast R-CNN network."""
 
+from __future__ import print_function
 from fast_rcnn.config import cfg
 import gt_data_layer.roidb as gdl_roidb
 import roi_data_layer.roidb as rdl_roidb
@@ -35,10 +36,10 @@ class SolverWrapper(object):
         self.output_dir = output_dir
         self.pretrained_model = pretrained_model
 
-        print 'Computing bounding-box regression targets...'
+        print('Computing bounding-box regression targets...')
         if cfg.TRAIN.BBOX_REG:
             self.bbox_means, self.bbox_stds = rdl_roidb.add_bbox_regression_targets(self.roidb)
-        print 'done'
+        print('done')
 
         # For checkpoint
         self.saver = tf.train.Saver(max_to_keep=100)
@@ -73,7 +74,7 @@ class SolverWrapper(object):
         filename = os.path.join(self.output_dir, filename)
 
         self.saver.save(sess, filename)
-        print 'Wrote snapshot to: {:s}'.format(filename)
+        print('Wrote snapshot to: {:s}').format(filename)
 
         if cfg.TRAIN.BBOX_REG and net.layers.has_key('bbox_pred'):
             with tf.variable_scope('bbox_pred', reuse=True):
@@ -152,7 +153,7 @@ class SolverWrapper(object):
             # get one batch
             blobs = data_layer.forward()
             
-	    if DEBUG:
+            if DEBUG:
                 print('DEBUG training iter loop blobs[data].shape={} im_info={}'.format(blobs['data'].shape,blobs['im_info']))
 
             # Make one SGD update
@@ -181,9 +182,9 @@ class SolverWrapper(object):
                 trace_file.close()
 
             if (iter+1) % (cfg.TRAIN.DISPLAY) == 0:
-                print 'iter: %d / %d, total loss: %.4f, rpn_loss_cls: %.4f, rpn_loss_box: %.4f, loss_cls: %.4f, loss_box: %.4f, lr: %f'%\
+                print('iter: %d / %d, total loss: %.4f, rpn_loss_cls: %.4f, rpn_loss_box: %.4f, loss_cls: %.4f, loss_box: %.4f, lr: %f')%\
                         (iter+1, max_iters, rpn_loss_cls_value + rpn_loss_box_value + loss_cls_value + loss_box_value ,rpn_loss_cls_value, rpn_loss_box_value,loss_cls_value, loss_box_value, lr.eval())
-                print 'speed: {:.3f}s / iter'.format(timer.average_time)
+                print('speed: {:.3f}s / iter').format(timer.average_time)
 
             if (iter+1) % cfg.TRAIN.SNAPSHOT_ITERS == 0:
                 last_snapshot_iter = iter
@@ -195,11 +196,11 @@ class SolverWrapper(object):
 def get_training_roidb(imdb,classes):
     """Returns a roidb (Region of Interest database) for use in training."""
     if cfg.TRAIN.USE_FLIPPED:
-        print 'Appending horizontally-flipped training examples...'
+        print('Appending horizontally-flipped training examples...')
         imdb.append_flipped_images()
-        print 'done'
+        print('done')
 
-    print 'Preparing training data...'
+    print('Preparing training data...')
     if cfg.TRAIN.HAS_RPN:
         if cfg.IS_MULTISCALE:
             gdl_roidb.prepare_roidb(imdb)
@@ -207,7 +208,7 @@ def get_training_roidb(imdb,classes):
             rdl_roidb.prepare_roidb(imdb,classes)
     else:
         rdl_roidb.prepare_roidb(imdb,classes)
-    print 'done'
+    print('done')
 
     return imdb.roidb
 
@@ -232,6 +233,6 @@ def train_net(network, imdb, roidb, output_dir, pretrained_model=None, max_iters
 
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
         sw = SolverWrapper(sess, network, imdb, roidb, output_dir, pretrained_model=pretrained_model)
-        print 'Solving...'
+        print('Solving...')
         sw.train_model(sess, max_iters)
-        print 'done solving'
+        print('done solving')

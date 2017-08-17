@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 import roi_pooling_layer.roi_pooling_op as roi_pool_op
@@ -49,9 +50,9 @@ class Network(object):
                     try:
                         var = tf.get_variable(subkey)
                         session.run(var.assign(data_dict[key][subkey]))
-                        print "assign pretrain model "+subkey+ " to "+key
+                        print("assign pretrain model "+subkey+ " to "+key)
                     except ValueError:
-                        print "ignore "+key
+                        print("ignore "+key)
                         if not ignore_missing:
 
                             raise
@@ -63,9 +64,9 @@ class Network(object):
             if isinstance(layer, basestring):
                 try:
                     layer = self.layers[layer]
-                    print layer
+                    print(layer)
                 except KeyError:
-                    print self.layers.keys()
+                    print(self.layers.keys())
                     raise KeyError('Unknown layer name fed: %s'%layer)
             self.inputs.append(layer)
         return self
@@ -74,7 +75,7 @@ class Network(object):
         try:
             layer = self.layers[layer]
         except KeyError:
-            print self.layers.keys()
+            print(self.layers.keys())
             raise KeyError('Unknown layer name fed: %s'%layer)
         return layer
 
@@ -145,7 +146,7 @@ class Network(object):
         if isinstance(input[1], tuple):
             input[1] = input[1][0]
 
-        print input
+        print(input)
         return roi_pool_op.roi_pool(input[0], input[1],
                                     pooled_height,
                                     pooled_width,
