@@ -5,4 +5,5 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
+from . import faster_rcnn_tf
 from . import config

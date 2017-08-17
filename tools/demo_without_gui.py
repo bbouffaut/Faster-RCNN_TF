@@ -27,7 +27,7 @@ def vis_detections(im, class_name, dets, thresh=0.5):
     for i in inds:
         bbox = dets[i, :4]
         score = dets[i, -1]
-	print(class_name,score)
+	    print(class_name,score)
 
      
 def demo(sess, net, image_name):
