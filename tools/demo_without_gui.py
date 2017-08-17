@@ -10,15 +10,13 @@ import argparse
 from networks.factory import get_network
 
 
-'''CLASSES = ('__background__',
+CLASSES = ('__background__',
            'aeroplane', 'bicycle', 'bird', 'boat',
            'bottle', 'bus', 'car', 'cat', 'chair',
            'cow', 'diningtable', 'dog', 'horse',
            'motorbike', 'person', 'pottedplant',
-           'sheep', 'sofa', 'train', 'tvmonitor')'''
+           'sheep', 'sofa', 'train', 'tvmonitor')
 
-
-CLASSES = ('__background__','person','cat')
 
 def vis_detections(im, class_name, dets, thresh=0.5):
     """Draw detected bounding boxes."""

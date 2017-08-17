@@ -24,7 +24,7 @@ def get_network(name, classes=None):
     #if not __sets.has_key(name):
     #    raise KeyError('Unknown dataset: {}'.format(name))
     #return __sets[name]
-    print("DEBUG get_network {0}".format(classes))
+    print("DEBUG get_network classes={0}".format(classes))
     
     if name.split('_')[1] == 'test':
        return networks.VGGnet_test(classes)
