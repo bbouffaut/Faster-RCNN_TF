@@ -1,12 +1,14 @@
-import _init_paths
+from module import _init_paths
 import tensorflow as tf
 from fast_rcnn.test import im_detect
 from fast_rcnn.nms_wrapper import nms
 from fast_rcnn.config import cfg
 from networks.factory import get_network
-from faster_rcnn_tf_module import config as module_cfg
+from module import config as module_cfg
 import numpy as np
 import os, sys, cv2
+
+global __INSTANCE__
 
 class FastRCNNTf:
 
@@ -67,16 +69,18 @@ class FastRCNNTf:
 		return vis_detections(im,cls,dets, thresh=module_cfg.CONF_THRESH)
 
 def init_tf_network(model):
-	global fast_rcnn_tf_instance
+	global __INSTANCE__
 
-	if not fast_rcnn_tf_instance:
-		fast_rcnn_tf_instance = FastRCNNTf(model)
+	if __INSTANCE__ is None:
+		__INSTANCE__ = FastRCNNTf(model)
 
 def process_image(image):
-	if not fast_rcnn_tf_instance:
+	global __INSTANCE__
+
+	if __INSTANCE__ is None:
 		raise Exception('Fast_Rcnn_tf shall be initialized first: call init_tf_network(model)')
 
-	return fast_rcnn_tf_instance.process_image(image)
+	return __INSTANCE__.process_image(image)
 	
 def parse_args():
     """Parse input arguments."""
