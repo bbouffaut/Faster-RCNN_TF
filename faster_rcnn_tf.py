@@ -4,11 +4,33 @@ from fast_rcnn.test import im_detect
 from fast_rcnn.nms_wrapper import nms
 from fast_rcnn.config import cfg
 from networks.factory import get_network
-from module import config as module_cfg
+from module.config import cfg as module_cfg
+from utils.timer import Timer
 import numpy as np
 import os, sys, cv2
 
 global __INSTANCE__
+__INSTANCE__ = None
+
+class VisObject(object):
+    pass
+
+class ProcessedImage:
+    def __init__(self, image_name):
+        self.image_name = image_name
+	# Load the demo image
+	self.im_file = os.path.join(self.image_name)
+	self.cv_im = cv2.imread(self.im_file)
+        self.vis = []
+
+    def get_cv_im(self):
+        return self.cv_im
+
+    def add_vis(self, vis_object):
+	self.vis.append(vis_object)
+
+    def get_vis(self):
+	return self.vis
 
 class FastRCNNTf:
 
@@ -18,45 +40,40 @@ class FastRCNNTf:
 		# init session
 		self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 		# load network
-		self.net = get_network()	    
+		self.net = get_network(module_cfg.NET_TYPE)	    
 	    # load model
 		self.saver = tf.train.Saver()
-		self.saver.restore(sess, model)
+		self.saver.restore(self.sess, model)
 	    #sess.run(tf.initialize_all_variables())
 
-		if cfg.DEBUG:
-			print('\n\nLoaded network {:s}'.format(args.model))
+		if module_cfg.DEBUG:
+			print('\n\nLoaded network {:s}'.format(model))
 
-	def vis_detections(self, im, class_name, dets, thresh=0.5):
+	def vis_detections(self, image, class_name, dets, thresh=0.5):
 	    """Draw detected bounding boxes."""
 	    inds = np.where(dets[:, -1] >= thresh)[0]
 	    if len(inds) == 0:
 	        return
 
-	    vis = []
-
 	    for i in inds:
-	        bbox = dets[i, :4]
-	        score = dets[i, -1]
-	        vis.append()
-		return (class_name,score)
-
+		vis_object = VisObject()
+	        vis_object.bbox = dets[i, :4]
+	        vis_object.score = dets[i, -1]	
+	        vis_object.class_name = class_name
+		image.add_vis(vis_object)
 	     
 	def process_image(self, image_name):
 	    """Detect object classes in an image using pre-computed object proposals."""
-
-	    # Load the demo image
-	    im_file = os.path.join(image_name)
-	    #im_file = os.path.join('/home/corgi/Lab/label/pos_frame/ACCV/training/000001/',image_name)
-	    im = cv2.imread(im_file)
-
+	    image = ProcessedImage(image_name)
 	    # Detect all object classes and regress object bounds
-	    scores, boxes = im_detect(self.sess, self.net, im)
+	    timer = Timer()
+	    timer.tic()
+	    scores, boxes = im_detect(self.sess, self.net, image.get_cv_im())
+	    timer.toc()
 
 	    if module_cfg.DEBUG:
 	    	print ('Detection took {:.3f}s for '
 	        	'{:d} object proposals').format(timer.total_time, boxes.shape[0])
-
 	    for cls_ind, cls in enumerate(module_cfg.CLASSES[1:]):
 	        cls_ind += 1 # because we skipped background
 	        cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
@@ -65,8 +82,9 @@ class FastRCNNTf:
 	                          cls_scores[:, np.newaxis])).astype(np.float32)
 	        keep = nms(dets, module_cfg.NMS_THRESH)
 	        dets = dets[keep, :]
-		
-		return vis_detections(im,cls,dets, thresh=module_cfg.CONF_THRESH)
+		self.vis_detections(image,cls,dets, thresh=module_cfg.CONF_THRESH)
+	    
+	    return image.get_vis()
 
 def init_tf_network(model):
 	global __INSTANCE__
@@ -82,6 +100,11 @@ def process_image(image):
 
 	return __INSTANCE__.process_image(image)
 	
+
+# #########################################################
+# Below is the code on case of direct usage from command-line
+# #########################################################
+
 def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser(description='Faster R-CNN demo')
