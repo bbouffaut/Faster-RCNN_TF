@@ -16,6 +16,7 @@ class VisObject(object):
     pass
 
 class ProcessedImage:
+
     def __init__(self, image_name):
         self.image_name = image_name
 	# Load the demo image
@@ -70,6 +71,7 @@ class FastRCNNTf:
 	    timer.tic()
 	    scores, boxes = im_detect(self.sess, self.net, image.get_cv_im())
 	    timer.toc()
+	    image.processing_time = timer.total_time
 
 	    if module_cfg.DEBUG:
 	    	print ('Detection took {:.3f}s for '
