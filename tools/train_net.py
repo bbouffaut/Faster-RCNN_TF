@@ -91,8 +91,11 @@ if __name__ == '__main__':
 
     df = datasets_factory(args.classes)
     imdb = df.get_imdb(args.imdb_name)
-    print 'Loaded dataset `{:s}` for training'.format(imdb.name)
-    roidb = get_training_roidb(imdb,[i for i, j in enumerate(imdb.classes) if j in args.classes])
+    print 'Loaded dataset `{:s}` for training with classes={}'.format(imdb.name,imdb.classes)
+    if (args.classes != None):
+        roidb = get_training_roidb(imdb,[i for i, j in enumerate(imdb.classes) if j in args.classes])
+    else:
+        roidb = get_training_roidb(imdb,[i for i, j in enumerate(imdb.classes)])
 
     output_dir = get_output_dir(imdb, None)
     print 'Output will be saved to `{:s}`'.format(output_dir)
