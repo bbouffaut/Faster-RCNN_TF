@@ -118,7 +118,7 @@ class imdb(object):
 	                     'gt_classes' : self.roidb[i]['gt_classes'],
 	                     'flipped' : True}
         	    self.roidb.append(entry)
-             self._image_index = self._image_index * 2
+            self._image_index = self._image_index * 2
 
     def evaluate_recall(self, candidate_boxes=None, thresholds=None,
                         area='all', limit=None):

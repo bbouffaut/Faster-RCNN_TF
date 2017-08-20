@@ -278,51 +278,6 @@ class pascal_voc(imdb):
 		if DEBUG:
                 	print('DEBUG _load_pascal_annotation no ROI in image {}'.format(index))
 		return None
-=======
-        objs = self._get_objs_for_selected_classes(objs)
-        num_objs = len(objs)
-
-        boxes = np.zeros((num_objs, 4), dtype=np.uint16)
-        gt_classes = np.zeros((num_objs), dtype=np.int32)
-        overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
-        # "Seg" area for pascal is just the box area
-        seg_areas = np.zeros((num_objs), dtype=np.float32)
-
-        # Load object bounding boxes into a data frame.
-        for ix, obj in enumerate(objs):
-
-            cls_name = obj.find('name').text.lower().strip()
-
-            #Load only regions that match one of the configured classes => other case should not appear because we have selected objs that contains selected classes only
-            if (cls_name in self._classes):
-                bbox = obj.find('bndbox')
-                # Make pixel indexes 0-based
-                x1 = float(bbox.find('xmin').text) - 1
-                y1 = float(bbox.find('ymin').text) - 1
-                x2 = float(bbox.find('xmax').text) - 1
-                y2 = float(bbox.find('ymax').text) - 1
-                cls = self._class_to_ind[cls_name]
-
-                boxes[ix, :] = [x1, y1, x2, y2]
-                gt_classes[ix] = cls
-                overlaps[ix, cls] = 1.0
-                seg_areas[ix] = (x2 - x1 + 1) * (y2 - y1 + 1)
-
-                '''if DEBUG:
-                    print('DEBUG _load_pascal_annotation class={} class_counter={} boxes={}'.format(cls,ix,boxes))'''
-
-        overlaps = scipy.sparse.csr_matrix(overlaps)
-        
-        '''if DEBUG:
-            print('DEBUG _load_pascal_annotation ROI class={} found in image {}'.format(len(boxes),index))'''
-        
-        return {'boxes' : boxes,
-            'gt_classes': gt_classes,
-            'gt_overlaps' : overlaps,
-            'flipped' : False,
-            'seg_areas' : seg_areas}
-
->>>>>>> 2961dc34a3b6a89ebd5fe95a975210919ae4724d
 
     def _get_comp_id(self):
         comp_id = (self._comp_id + '_' + self._salt if self.config['use_salt']
