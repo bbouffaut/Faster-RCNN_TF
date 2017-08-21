@@ -8,12 +8,14 @@ from module.config import cfg as module_cfg
 from utils.timer import Timer
 import numpy as np
 import os, sys, cv2
+import matplotlib.pyplot as plt
 
 global __INSTANCE__
 __INSTANCE__ = None
 
 class VisObject(object):
     pass
+
 
 class ProcessedImage:
 
@@ -22,16 +24,47 @@ class ProcessedImage:
 	# Load the demo image
 	self.im_file = os.path.join(self.image_name)
 	self.cv_im = cv2.imread(self.im_file)
-        self.vis = []
+        self.objects = []
 
     def get_cv_im(self):
         return self.cv_im
 
-    def add_vis(self, vis_object):
-	self.vis.append(vis_object)
+    def add_object(self, vis_object):
+	self.objects.append(vis_object)
 
-    def get_vis(self):
-	return self.vis
+    def get_objects(self):
+	return self.objects
+
+    def get_annotated_image(self):
+        im = self.cv_im[:, :, (2, 1, 0)]
+        fig, ax = plt.subplots(figsize=(12, 12))
+        ax.imshow(im, aspect='equal')
+
+        for obj in self.objects:
+            bbox = obj.bbox
+	    score = obj.score
+
+	    ax.add_patch(
+		plt.Rectangle((bbox[0], bbox[1]),
+			bbox[2] - bbo[0],
+			bbox[3] - bbox[1], fill=False,
+			edgecolor='red', linewidth=3.5)
+	    )
+	    
+	    ax.text(bbox[0], bbox[1] - 2,
+                '{:s} {:.3f}'.format(class_name, score),
+                bbox=dict(facecolor='blue', alpha=0.5),
+                fontsize=14, color='white')
+
+	ax.set_title(('{} detections with '
+                  'p({} | box) >= {:.1f}').format(class_name, class_name,module_cfg.CONF_THRESH),fontsize=14)
+    	plt.axis('off')
+	plt.tight_layout()
+	self.annotated_image = os.path.join(self.image_name,'annotated')
+	plt.savefig(self.annotated_image)
+	return self.annotated_image
+
+
 
 class FastRCNNTf:
 
@@ -61,9 +94,11 @@ class FastRCNNTf:
 	        vis_object.bbox = dets[i, :4]
 	        vis_object.score = dets[i, -1]	
 	        vis_object.class_name = class_name
-		image.add_vis(vis_object)
+		image.add_object(vis_object)
 	     
-	def process_image(self, image_name):
+	
+
+	def process_image(self, image_name, events_handler):
 	    """Detect object classes in an image using pre-computed object proposals."""
 	    image = ProcessedImage(image_name)
 	    # Detect all object classes and regress object bounds
@@ -76,6 +111,7 @@ class FastRCNNTf:
 	    if module_cfg.DEBUG:
 	    	print ('Detection took {:.3f}s for '
 	        	'{:d} object proposals').format(timer.total_time, boxes.shape[0])
+
 	    for cls_ind, cls in enumerate(module_cfg.CLASSES[1:]):
 	        cls_ind += 1 # because we skipped background
 	        cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
@@ -84,9 +120,14 @@ class FastRCNNTf:
 	                          cls_scores[:, np.newaxis])).astype(np.float32)
 	        keep = nms(dets, module_cfg.NMS_THRESH)
 	        dets = dets[keep, :]
-		self.vis_detections(image,cls,dets, thresh=module_cfg.CONF_THRESH)
-	    
-	    return image.get_vis()
+	        self.vis_detections(image, cls, dets, thresh=module_cfg.CONF_THRESH)
+
+#	    image_incl_objs = image.get_annotated_image()
+
+	    if (events_handler != None) and (hasattr(events_handler,'on_detect_objects')):
+	        events_handler.on_detect_objects(image, image.processing_time, image.get_objects(), None)
+	    else:
+	        return image.get_vis()
 
 def init_tf_network(model):
 	global __INSTANCE__
@@ -94,13 +135,13 @@ def init_tf_network(model):
 	if __INSTANCE__ is None:
 		__INSTANCE__ = FastRCNNTf(model)
 
-def process_image(image):
+def process_image(image,events_handler):
 	global __INSTANCE__
 
 	if __INSTANCE__ is None:
 		raise Exception('Fast_Rcnn_tf shall be initialized first: call init_tf_network(model)')
 
-	return __INSTANCE__.process_image(image)
+	return __INSTANCE__.process_image(image, events_handler)
 	
 
 # #########################################################
