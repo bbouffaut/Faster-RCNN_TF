@@ -4,8 +4,17 @@ import threading
 import Queue
 import os
 from utils.timer import Timer
+from handlers import EventsHandler
 
 exit_flag = 0
+
+class MyEventsHandler(EventsHandler):
+    def __init__(self,thread_id):
+       self.thread_id = thread_id 
+
+    def on_detect_objects(self, image, processing_time, objects, image_annotated):
+        print('{} processed image {} in {:.3f} for {:d} objects detected'.format(self.thread_id, image.image_name, processing_time, len(objects)))
+
 
 class ImageProcessingThread(threading.Thread):
 	
@@ -19,17 +28,13 @@ class ImageProcessingThread(threading.Thread):
 
 
 def process_input_queue(thread_id, q):
+	events_handler = MyEventsHandler(thread_id)
 	while not exit_flag:
 	    input_queue_lock.acquire()
 	    if not q.empty():
 	        image_name = q.get()
 		input_queue_lock.release()
-		
-		proc_timer = Timer()
-		proc_timer.tic()
-		vis = f_rcnn.process_image(image_name)
-		proc_timer.toc()
-		print('{} processed image {} in {:.3f} for {:d} object detected'.format(thread_id, image_name, proc_timer.total_time, len(vis)))
+		f_rcnn.process_image(image_name,events_handler)
 	    else:
 	        input_queue_lock.release()
 	    
