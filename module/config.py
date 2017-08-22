@@ -5,7 +5,7 @@ __C = edict()
 #   from fast_rcnn_config import cfg
 cfg = __C
 
-__C.DEBUG = True
+__C.DEBUG = False 
 
 __C.NET_TYPE = 'VGGnet_test'
 

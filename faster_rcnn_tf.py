@@ -46,7 +46,7 @@ class ProcessedImage:
 
 	    ax.add_patch(
 		plt.Rectangle((bbox[0], bbox[1]),
-			bbox[2] - bbo[0],
+			bbox[2] - bbox[0],
 			bbox[3] - bbox[1], fill=False,
 			edgecolor='red', linewidth=3.5)
 	    )

@@ -14,17 +14,26 @@ class MyEventsHandler(EventsHandler):
 
     def on_detect_objects(self, image, processing_time, objects, image_annotated):
         print('{} processed image {} in {:.3f} for {:d} objects detected'.format(self.thread_id, image.image_name, processing_time, len(objects)))
+	if (len(objects) > 0):
+	    output_queue_lock.acquire()
+	    output_queue.put(image)
+	    output_queue_lock.release()
 
 
 class ImageProcessingThread(threading.Thread):
 	
-	def __init__(self,thread_id,input_queue):
+	def __init__(self,thread_id,queue):
 	    threading.Thread.__init__(self)
 	    self.thread_id = thread_id
-	    self.q = input_queue
+	    self.q = queue
 	
 	def run(self):
-	    process_input_queue(self.thread_id,self.q)
+	    if ('Output' in self.thread_id):
+		print('Start OutputThread processing {}'.format(self.thread_id))
+	        process_output_queue(self.thread_id, self.q)
+	    else:
+		print('Start InputThread processing {}'.format(self.thread_id))
+	        process_input_queue(self.thread_id, self.q)
 
 
 def process_input_queue(thread_id, q):
@@ -32,19 +41,42 @@ def process_input_queue(thread_id, q):
 	while not exit_flag:
 	    input_queue_lock.acquire()
 	    if not q.empty():
-	        image_name = q.get()
-		input_queue_lock.release()
-		f_rcnn.process_image(image_name,events_handler)
+	        try:
+	            image_name = q.get()
+		    input_queue_lock.release()
+		    f_rcnn.process_image(image_name,events_handler)
+		except Exception as ex:
+		    print('Exception occured {}'.format(ex))
+	            input_queue_lock.release()
 	    else:
 	        input_queue_lock.release()
 	    
-	    	
+def process_output_queue(thread_id, q):
+	while not exit_flag:
+	    output_queue_lock.acquire()
+	    if not q.empty():
+	        try:
+		    image = q.get()
+		    output_queue_lock.release()
+		    #annotated_image = image.get_annotated_image()
+		    #print(len(annotated_image))
+		    print('OutputProcessing {}'.format(image.image_name))
+       		except Exception as ex:
+		    print('Exception occured {}'.format(ex))
+		    output_queue_lock.release()
+       	    else:
+	        output_queue_lock.release()
+		    	
 input_queue_lock = threading.Lock()
 input_queue = Queue.Queue()
 threads = []
+output_queue = Queue.Queue()
+output_queue_lock = threading.Lock()
+output_threads = []
 
 nb_threads = 1
 images_list = ['000456.jpg','000542.jpg','001150.jpg','001763.jpg','004545.jpg','pedestrian_cars.jpg','000456.jpg','000542.jpg','001150.jpg','001763.jpg','004545.jpg','pedestrian_cars.jpg']
+nb_output_threads = 1
 
 timer = Timer()
 
@@ -56,6 +88,13 @@ for t_name in [('Thread-' + str(i)) for i in range(nb_threads)]:
    thread = ImageProcessingThread(t_name, input_queue)
    thread.start()
    threads.append(thread)
+
+# Create new OUTPUT threads
+for t_name in [('OutputThread-' + str(i)) for i in range(nb_output_threads)]:
+   thread = ImageProcessingThread(t_name, output_queue)
+   thread.start()
+   output_threads.append(thread)
+
 
 # Fill the input queue with list of images => START Timer
 timer.tic()
