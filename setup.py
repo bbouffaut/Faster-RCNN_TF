@@ -1,5 +1,4 @@
 from setuptools import setup
-from faster_rcnn_tf_module import faster_rcnn_tf
 
 def read_readme():
     with open('README.md') as f:

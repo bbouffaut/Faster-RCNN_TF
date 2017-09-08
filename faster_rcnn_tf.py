@@ -34,7 +34,7 @@ class ProcessedImage:
     def get_objects(self):
 	return self.objects
 
-    def get_annotated_image(self):
+    def write_annotated_image(self, target_filename):
 
 	font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -57,11 +57,7 @@ class ProcessedImage:
 		2,	
 		cv2.LINE_AA)
 
-	image_name_split = os.path.splitext(self.image_name)
-	self.annotated_image = image_name_split[0] + '_annotated' + image_name_split[1]
-	cv2.imwrite(self.annotated_image, self.cv_im)
-	return self.annotated_image
-
+	cv2.imwrite(target_filename, self.cv_im)
 
 
 class FastRCNNTf:
@@ -122,8 +118,8 @@ class FastRCNNTf:
 
 #	    image_incl_objs = image.get_annotated_image()
 
-	    if (events_handler != None) and (hasattr(events_handler,'on_detect_objects')):
-	        events_handler.on_detect_objects(image, image.processing_time, image.get_objects())
+	    if (events_handler != None) and (hasattr(events_handler,'processing_done')):
+	        events_handler.processing_done(image, image.processing_time, image.get_objects())
 	    else:
 	        return image.get_vis()
 
