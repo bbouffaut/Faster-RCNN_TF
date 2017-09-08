@@ -10,3 +10,4 @@ data/VOCdevkit2007
 debug.*
 experiments/logs/
 output/
+data/demo/*

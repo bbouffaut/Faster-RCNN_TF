@@ -12,7 +12,7 @@ class MyEventsHandler(EventsHandler):
     def __init__(self,thread_id):
        self.thread_id = thread_id 
 
-    def on_detect_objects(self, image, processing_time, objects, image_annotated):
+    def on_detect_objects(self, image, processing_time, objects):
         print('{} processed image {} in {:.3f} for {:d} objects detected'.format(self.thread_id, image.image_name, processing_time, len(objects)))
 	if (len(objects) > 0):
 	    output_queue_lock.acquire()
@@ -58,9 +58,8 @@ def process_output_queue(thread_id, q):
 	        try:
 		    image = q.get()
 		    output_queue_lock.release()
-		    #annotated_image = image.get_annotated_image()
-		    #print(len(annotated_image))
-		    print('OutputProcessing {}'.format(image.image_name))
+		    annotated_image = image.get_annotated_image()
+		    print('OutputProcessing {}'.format(annotated_image))
        		except Exception as ex:
 		    print('Exception occured {}'.format(ex))
 		    output_queue_lock.release()

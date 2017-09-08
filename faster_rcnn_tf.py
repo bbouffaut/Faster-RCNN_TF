@@ -8,7 +8,6 @@ from module.config import cfg as module_cfg
 from utils.timer import Timer
 import numpy as np
 import os, sys, cv2
-import matplotlib.pyplot as plt
 
 global __INSTANCE__
 __INSTANCE__ = None
@@ -36,32 +35,31 @@ class ProcessedImage:
 	return self.objects
 
     def get_annotated_image(self):
-        im = self.cv_im[:, :, (2, 1, 0)]
-        fig, ax = plt.subplots(figsize=(12, 12))
-        ax.imshow(im, aspect='equal')
+
+	font = cv2.FONT_HERSHEY_SIMPLEX
 
         for obj in self.objects:
             bbox = obj.bbox
 	    score = obj.score
 
-	    ax.add_patch(
-		plt.Rectangle((bbox[0], bbox[1]),
-			bbox[2] - bbox[0],
-			bbox[3] - bbox[1], fill=False,
-			edgecolor='red', linewidth=3.5)
-	    )
-	    
-	    ax.text(bbox[0], bbox[1] - 2,
-                '{:s} {:.3f}'.format(class_name, score),
-                bbox=dict(facecolor='blue', alpha=0.5),
-                fontsize=14, color='white')
+	    cv2.rectangle(self.cv_im,
+		(int(round(bbox[0])), int(round(bbox[1]))),
+		(int(round(bbox[2])), int(round(bbox[3]))),
+		(255, 0 ,0),
+		2)
 
-	ax.set_title(('{} detections with '
-                  'p({} | box) >= {:.1f}').format(class_name, class_name,module_cfg.CONF_THRESH),fontsize=14)
-    	plt.axis('off')
-	plt.tight_layout()
-	self.annotated_image = os.path.join(self.image_name,'annotated')
-	plt.savefig(self.annotated_image)
+	    cv2.putText(self.cv_im,
+		'{:s} {:.3f}'.format(obj.class_name, score),
+		(int(round(bbox[0])), int(round(bbox[1])) - 5),	
+		font,
+		0.8,
+		(255, 0, 0),
+		2,	
+		cv2.LINE_AA)
+
+	image_name_split = os.path.splitext(self.image_name)
+	self.annotated_image = image_name_split[0] + '_annotated' + image_name_split[1]
+	cv2.imwrite(self.annotated_image, self.cv_im)
 	return self.annotated_image
 
 
@@ -125,7 +123,7 @@ class FastRCNNTf:
 #	    image_incl_objs = image.get_annotated_image()
 
 	    if (events_handler != None) and (hasattr(events_handler,'on_detect_objects')):
-	        events_handler.on_detect_objects(image, image.processing_time, image.get_objects(), None)
+	        events_handler.on_detect_objects(image, image.processing_time, image.get_objects())
 	    else:
 	        return image.get_vis()
 
