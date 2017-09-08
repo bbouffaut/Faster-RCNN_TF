@@ -6,7 +6,7 @@ def read_readme():
 
 setup(
     name='faster_rcnn_tf',
-    version=faster_rcnn_tf.__version__,
+    version='1.2.0',
     license='MIT',
     description='Module to load Faster RCNN TF capabilities',
     long_description=read_readme(),
