@@ -23,8 +23,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: System :: Monitoring',
     ],
-    #packages=['gpustat'],
-    py_modules=['faster_rcnn_tf'],
+    packages=['faster_rcnn_tf'],
+    #py_modules=['faster_rcnn_tf'],
     install_requires=[
     ],
     test_suite='',
