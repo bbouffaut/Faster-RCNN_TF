@@ -23,3 +23,7 @@ add_path(lib_path)
 # Add lib to PYTHONPATH
 handlers_path = osp.join(this_dir, '..', 'handlers')
 add_path(handlers_path)
+
+# Add lib to PYTHONPATH
+handlers_path = osp.join(this_dir, '..', 'lib','utils')
+add_path(handlers_path)
