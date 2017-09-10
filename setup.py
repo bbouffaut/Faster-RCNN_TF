@@ -23,7 +23,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: System :: Monitoring',
     ],
-    packages=find_packages(exclude=['module', 'handlers']),
+    packages=find_packages(exclude=['lib']),
     #py_modules=['faster_rcnn_tf',],
     install_requires=[
     ],
