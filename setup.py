@@ -24,7 +24,8 @@ setup(
         'Topic :: System :: Monitoring',
     ],
     packages=find_packages(),
-    #py_modules=['faster_rcnn_tf',],
+    #namespace_package=['faster_rcnn_tf'],
+    #py_modules=['faster_rcnn_tf','handlers'],
     install_requires=[
     ],
     test_suite='',
