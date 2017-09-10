@@ -12,5 +12,4 @@ experiments/logs/
 output/
 data/demo/*
 build/*
-dist/*
 *.egg-info/*
