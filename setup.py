@@ -25,7 +25,7 @@ setup(
     ],
     packages=['faster_rcnn_tf'],
     #py_modules=['faster_rcnn_tf'],
-    install_requires=[
+    install_requires=['fast_rcnn'
     ],
     test_suite='',
     tests_require=[],

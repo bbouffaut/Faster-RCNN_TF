@@ -11,6 +11,7 @@ import numpy as np
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
+from setuptools import find_packages
 
 def find_in_path(name, path):
     "Find a file in a search path"
@@ -149,6 +150,7 @@ if CUDA:
 
 setup(
     name='fast_rcnn',
+    packages=find_packages(),
     ext_modules=ext_modules,
     # inject our custom trigger
     cmdclass={'build_ext': custom_build_ext},
