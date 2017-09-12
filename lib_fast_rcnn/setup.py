@@ -9,9 +9,8 @@ import os
 from os.path import join as pjoin
 import numpy as np
 from distutils.core import setup
-from distutils.extension import Extension
 from Cython.Distutils import build_ext
-from setuptools import find_packages
+from setuptools import find_packages, Extension
 
 def find_in_path(name, path):
     "Find a file in a search path"
@@ -108,20 +107,20 @@ class custom_build_ext(build_ext):
 
 ext_modules = [
     Extension(
-        "utils.cython_bbox",
-        ["utils/bbox.pyx"],
+        "lib_fast_rcnn.utils.cython_bbox",
+        ["lib_fast_rcnn/utils/bbox.pyx"],
         extra_compile_args={'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
 	include_dirs = [numpy_include]
 	),
     Extension(
-        "utils.cython_nms",
-        ["utils/nms.pyx"],
+        "lib_fast_rcnn.utils.cython_nms",
+        ["lib_fast_rcnn/utils/nms.pyx"],
         extra_compile_args={'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
         include_dirs = [numpy_include]
     ),
     Extension(
-        "nms.cpu_nms",
-        ["nms/cpu_nms.pyx"],
+        "lib_fast_rcnn.nms.cpu_nms",
+        ["lib_fast_rcnn/nms/cpu_nms.pyx"],
         extra_compile_args={'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
         include_dirs = [numpy_include]
     )
@@ -129,8 +128,8 @@ ext_modules = [
 
 if CUDA:
     ext_modules.append(
-        Extension('nms.gpu_nms',
-            ['nms/nms_kernel.cu', 'nms/gpu_nms.pyx'],
+        Extension('lib_fast_rcnn.nms.gpu_nms',
+            ['lib_fast_rcnn/nms/nms_kernel.cu', 'lib_fast_rcnn/nms/gpu_nms.pyx'],
             library_dirs=[CUDA['lib64']],
             libraries=['cudart'],
             language='c++',
@@ -149,9 +148,13 @@ if CUDA:
     )
 
 setup(
-    name='fast_rcnn',
+    name='lib_fast_rcnn',
     packages=find_packages(),
     ext_modules=ext_modules,
     # inject our custom trigger
     cmdclass={'build_ext': custom_build_ext},
+    package_data = {
+        # If any package contains *.txt or *.rst files, include them:
+        '': ['*.so'],
+    },
 )
