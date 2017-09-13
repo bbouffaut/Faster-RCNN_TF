@@ -8,7 +8,7 @@
 import os
 import os.path as osp
 import PIL
-from utils.cython_bbox import bbox_overlaps
+from lib_fast_rcnn.utils.cython_bbox import bbox_overlaps
 import numpy as np
 import scipy.sparse
 from lib_fast_rcnn.fast_rcnn.config import cfg

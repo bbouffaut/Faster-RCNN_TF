@@ -10,8 +10,8 @@
 from lib_fast_rcnn.fast_rcnn.config import cfg
 import gt_data_layer.roidb as gdl_roidb
 import roi_data_layer.roidb as rdl_roidb
-from roi_data_layer.layer import RoIDataLayer
-from utils.timer import Timer
+from lib_fast_rcnn.roi_data_layer.layer import RoIDataLayer
+from lib_fast_rcnn.utils.timer import Timer
 import numpy as np
 import os
 import tensorflow as tf

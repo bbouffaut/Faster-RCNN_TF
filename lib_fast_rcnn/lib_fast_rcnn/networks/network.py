@@ -2,9 +2,9 @@ import numpy as np
 import tensorflow as tf
 import roi_pooling_layer.roi_pooling_op as roi_pool_op
 import roi_pooling_layer.roi_pooling_op_grad
-from rpn_msr.proposal_layer_tf import proposal_layer as proposal_layer_py
-from rpn_msr.anchor_target_layer_tf import anchor_target_layer as anchor_target_layer_py
-from rpn_msr.proposal_target_layer_tf import proposal_target_layer as proposal_target_layer_py
+from lib_fast_rcnn.rpn_msr.proposal_layer_tf import proposal_layer as proposal_layer_py
+from lib_fast_rcnn.rpn_msr.anchor_target_layer_tf import anchor_target_layer as anchor_target_layer_py
+from lib_fast_rcnn.rpn_msr.proposal_target_layer_tf import proposal_target_layer as proposal_target_layer_py
 
 
 

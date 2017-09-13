@@ -7,13 +7,13 @@ import PIL
 import datasets.imdb
 import numpy as np
 import scipy.sparse
-from utils.cython_bbox import bbox_overlaps
-from utils.boxes_grid import get_boxes_grid
+from lib_fast_rcnn.utils.cython_bbox import bbox_overlaps
+from lib_fast_rcnn.utils.boxes_grid import get_boxes_grid
 import subprocess
 import cPickle
 from lib_fast_rcnn.fast_rcnn.config import cfg
 import math
-from rpn_msr.generate_anchors import generate_anchors
+from lib_fast_rcnn.rpn_msr.generate_anchors import generate_anchors
 import sys
 
 class imagenet3d(datasets.imdb):

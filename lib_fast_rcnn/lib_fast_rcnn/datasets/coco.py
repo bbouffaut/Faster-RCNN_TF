@@ -4,7 +4,7 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
-from datasets.imdb import imdb
+from lib_fast_rcnn.datasets..imdb import imdb
 import datasets.ds_utils as ds_utils
 from lib_fast_rcnn.fast_rcnn.config import cfg
 import os.path as osp

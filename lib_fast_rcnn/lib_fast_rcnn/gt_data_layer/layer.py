@@ -12,7 +12,7 @@ GtDataLayer implements a Caffe Python layer.
 
 import caffe
 from lib_fast_rcnn.fast_rcnn.config import cfg
-from gt_data_layer.minibatch import get_minibatch
+from lib_fast_rcnn.gt_data_layer.minibatch import get_minibatch
 import numpy as np
 import yaml
 from multiprocessing import Process, Queue

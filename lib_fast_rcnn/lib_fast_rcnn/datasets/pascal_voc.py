@@ -6,7 +6,7 @@
 # --------------------------------------------------------
 
 import os
-from datasets.imdb import imdb
+from lib_fast_rcnn.datasets..imdb import imdb
 import datasets.ds_utils as ds_utils
 import xml.etree.ElementTree as ET
 import numpy as np
@@ -396,7 +396,7 @@ class pascal_voc(imdb):
             self.config['cleanup'] = True
 
 if __name__ == '__main__':
-    from datasets.pascal_voc import pascal_voc
+    from lib_fast_rcnn.datasets..pascal_voc import pascal_voc
     d = pascal_voc('trainval', '2007')
     res = d.roidb
     from IPython import embed; embed()

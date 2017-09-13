@@ -9,8 +9,8 @@
 
 import numpy as np
 from lib_fast_rcnn.fast_rcnn.config import cfg
-from utils.cython_bbox import bbox_overlaps
-from utils.boxes_grid import get_boxes_grid
+from lib_fast_rcnn.utils.cython_bbox import bbox_overlaps
+from lib_fast_rcnn.utils.boxes_grid import get_boxes_grid
 import scipy.sparse
 import PIL
 import math

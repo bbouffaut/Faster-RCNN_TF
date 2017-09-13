@@ -1,5 +1,5 @@
 import tensorflow as tf
-from networks.network import Network
+from lib_fast_rcnn.networks.network import Network
 
 
 #define
