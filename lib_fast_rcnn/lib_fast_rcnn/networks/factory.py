@@ -27,9 +27,9 @@ def get_network(name, classes=None):
     print("DEBUG get_network classes={0}".format(classes))
     
     if name.split('_')[1] == 'test':
-       return networks.VGGnet_test(classes)
+       return faster_rcnn_tf.networks.VGGnet_test(classes)
     elif name.split('_')[1] == 'train':
-       return networks.VGGnet_train(classes)
+       return faster_rcnn_tf.networks.VGGnet_train(classes)
     else:
        raise KeyError('Unknown dataset: {}'.format(name))
     
