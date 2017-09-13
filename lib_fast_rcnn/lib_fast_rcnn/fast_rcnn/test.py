@@ -3,7 +3,7 @@ import argparse
 from lib_fast_rcnn.utils.timer import Timer
 import numpy as np
 import cv2
-from lib_fast_rcnn.utils.cython_nms import lib_fast_rcnn.nms, nms_new
+from lib_fast_rcnn.utils.cython_nms import nms, nms_new
 from lib_fast_rcnn.utils.boxes_grid import get_boxes_grid
 import cPickle
 import heapq
