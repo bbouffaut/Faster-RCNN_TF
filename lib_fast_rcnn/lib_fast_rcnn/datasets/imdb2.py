@@ -12,7 +12,7 @@ from utils.cython_bbox import bbox_overlaps
 import numpy as np
 import scipy.sparse
 import datasets
-from fast_rcnn.config import cfg
+from lib_fast_rcnn.fast_rcnn.config import cfg
 
 class imdb(object):
     """Image database."""

@@ -17,7 +17,7 @@ import cPickle
 import subprocess
 import uuid
 from voc_eval import voc_eval
-from fast_rcnn.config import cfg
+from lib_fast_rcnn.fast_rcnn.config import cfg
 import pdb
 
 DEBUG = True

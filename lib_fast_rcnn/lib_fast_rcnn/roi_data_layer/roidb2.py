@@ -8,7 +8,7 @@
 """Transform a roidb into a trainable roidb by adding a bunch of metadata."""
 
 import numpy as np
-from fast_rcnn.config import cfg
+from lib_fast_rcnn.fast_rcnn.config import cfg
 import utils.cython_bbox
 
 def prepare_roidb(imdb):

@@ -7,7 +7,7 @@
 
 """Train a Fast R-CNN network."""
 
-from fast_rcnn.config import cfg
+from lib_fast_rcnn.fast_rcnn.config import cfg
 import gt_data_layer.roidb as gdl_roidb
 import roi_data_layer.roidb as rdl_roidb
 from roi_data_layer.layer import RoIDataLayer

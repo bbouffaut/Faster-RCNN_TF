@@ -1,4 +1,4 @@
-from fast_rcnn.config import cfg, get_output_dir
+from lib_fast_rcnn.fast_rcnn.config import cfg, get_output_dir
 import argparse
 from utils.timer import Timer
 import numpy as np
@@ -12,7 +12,7 @@ import os
 import math
 from rpn_msr.generate import imdb_proposals_det
 import tensorflow as tf
-from fast_rcnn.bbox_transform import clip_boxes, bbox_transform_inv
+from lib_fast_rcnn.fast_rcnn.bbox_transform import clip_boxes, bbox_transform_inv
 import matplotlib.pyplot as plt
 from tensorflow.python.client import timeline
 import time

@@ -4,6 +4,6 @@
 # Licensed under The MIT License [see LICENSE for details]
 # Written by Ross Girshick
 # --------------------------------------------------------
-from fast_rcnn import *
+from lib_fast_rcnn.fast_rcnn import *
 from . import config
 

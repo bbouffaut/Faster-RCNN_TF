@@ -25,7 +25,7 @@ from easydict import EasyDict as edict
 
 __C = edict()
 # Consumers can get config by:
-#   from fast_rcnn_config import cfg
+#   from lib_fast_rcnn.fast_rcnn_config import cfg
 cfg = __C
 
 # region proposal network (RPN) or not
