@@ -5,16 +5,16 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
-import datasets
-import datasets.pascal3d
+import lib_fast_rcnn.datasets
+import lib_fast_rcnn.datasets.pascal3d
 import os
 import PIL
-import datasets.imdb
+import lib_fast_rcnn.datasets.imdb
 import xml.dom.minidom as minidom
 import numpy as np
 import scipy.sparse
 import scipy.io as sio
-import utils.cython_bbox
+import lib_fast_rcnn.utils.cython_bbox
 import cPickle
 import subprocess
 from lib_fast_rcnn.utils.cython_bbox import bbox_overlaps

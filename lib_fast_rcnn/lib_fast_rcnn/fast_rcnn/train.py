@@ -8,8 +8,8 @@
 """Train a Fast R-CNN network."""
 
 from lib_fast_rcnn.fast_rcnn.config import cfg
-import gt_data_layer.roidb as gdl_roidb
-import roi_data_layer.roidb as rdl_roidb
+import lib_fast_rcnn.gt_data_layer.roidb as gdl_roidb
+import lib_fast_rcnn.roi_data_layer.roidb as rdl_roidb
 from lib_fast_rcnn.roi_data_layer.layer import RoIDataLayer
 from lib_fast_rcnn.utils.timer import Timer
 import numpy as np

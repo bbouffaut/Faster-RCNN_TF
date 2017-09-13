@@ -9,7 +9,7 @@
 
 import numpy as np
 from lib_fast_rcnn.fast_rcnn.config import cfg
-import utils.cython_bbox
+import lib_fast_rcnn.utils.cython_bbox
 
 def prepare_roidb(imdb):
     """Enrich the imdb's roidb by adding some derived quantities that

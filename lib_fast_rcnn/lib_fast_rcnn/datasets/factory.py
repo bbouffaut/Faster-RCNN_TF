@@ -7,10 +7,10 @@
 
 """Factory method for easily getting imdbs by name."""
 
-import datasets.pascal_voc
-import datasets.imagenet3d
-import datasets.kitti
-import datasets.kitti_tracking
+import lib_fast_rcnn.datasets.pascal_voc
+import lib_fast_rcnn.datasets.imagenet3d
+import lib_fast_rcnn.datasets.kitti
+import lib_fast_rcnn.datasets.kitti_tracking
 import numpy as np
 
 

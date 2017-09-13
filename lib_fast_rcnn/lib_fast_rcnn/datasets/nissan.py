@@ -1,10 +1,10 @@
 __author__ = 'yuxiang'
 
-import datasets
-import datasets.nissan
+import lib_fast_rcnn.datasets
+import lib_fast_rcnn.datasets.nissan
 import os
 import PIL
-import datasets.imdb
+import lib_fast_rcnn.datasets.imdb
 import numpy as np
 import scipy.sparse
 from lib_fast_rcnn.utils.cython_bbox import bbox_overlaps

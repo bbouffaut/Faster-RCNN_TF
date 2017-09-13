@@ -1,10 +1,10 @@
 __author__ = 'yuxiang' # derived from honda.py by fyang
 
-import datasets
-import datasets.kitti
+import lib_fast_rcnn.datasets
+import lib_fast_rcnn.datasets.kitti
 import os
 import PIL
-import datasets.imdb
+import lib_fast_rcnn.datasets.imdb
 import numpy as np
 import scipy.sparse
 from lib_fast_rcnn.utils.cython_bbox import bbox_overlaps

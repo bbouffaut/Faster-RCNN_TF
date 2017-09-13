@@ -9,8 +9,8 @@
 
 __sets = {}
 
-import networks.VGGnet_train
-import networks.VGGnet_test
+import lib_fast_rcnn.networks.VGGnet_train
+import lib_fast_rcnn.networks.VGGnet_test
 import pdb
 import tensorflow as tf
 

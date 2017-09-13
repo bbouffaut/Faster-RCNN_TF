@@ -11,7 +11,7 @@ import PIL
 from lib_fast_rcnn.utils.cython_bbox import bbox_overlaps
 import numpy as np
 import scipy.sparse
-import datasets
+import lib_fast_rcnn.datasets
 from lib_fast_rcnn.fast_rcnn.config import cfg
 
 class imdb(object):

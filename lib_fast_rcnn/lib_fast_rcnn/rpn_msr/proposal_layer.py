@@ -11,7 +11,7 @@ import yaml
 from lib_fast_rcnn.fast_rcnn.config import cfg
 from generate_anchors import generate_anchors
 from lib_fast_rcnn.fast_rcnn.bbox_transform import bbox_transform_inv, clip_boxes
-from lib_fast_rcnn.fast_rcnn.nms_wrapper import nms
+from lib_fast_rcnn.fast_rcnn.nms_wrapper import lib_fast_rcnn.nms
 
 DEBUG = False
 
