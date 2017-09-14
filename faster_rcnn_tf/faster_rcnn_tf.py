@@ -1,11 +1,10 @@
-import _init_paths
 import tensorflow as tf
-from fast_rcnn.test import im_detect
-from fast_rcnn.nms_wrapper import nms
-from fast_rcnn.config import cfg
-from networks.factory import get_network
+from lib_fast_rcnn.fast_rcnn.test import im_detect
+from lib_fast_rcnn.fast_rcnn.nms_wrapper import nms
+from lib_fast_rcnn.fast_rcnn.config import cfg
+from lib_fast_rcnn.networks.factory import get_network
 from config import cfg as module_cfg
-from utils.timer import Timer
+from lib_fast_rcnn.utils.timer import Timer
 import numpy as np
 import os, sys, cv2
 

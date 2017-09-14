@@ -12,4 +12,8 @@ experiments/logs/
 output/
 data/demo/*
 build/*
+lib_fast_rcnn/build/*
+dist/*
 *.egg-info/*
+lib_fast_rcnn/*.egg-info/*
+*.swp

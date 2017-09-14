@@ -1,4 +1,5 @@
-from setuptools import setup, find_packages
+from setuptools import setup
+from setuptools import find_packages
 
 def read_readme():
     with open('README.md') as f:
@@ -6,7 +7,7 @@ def read_readme():
 
 setup(
     name='faster_rcnn_tf',
-    version='1.2.1',
+    version='1.2.0',
     license='MIT',
     description='Module to load Faster RCNN TF capabilities',
     long_description=read_readme(),
@@ -24,9 +25,9 @@ setup(
         'Topic :: System :: Monitoring',
     ],
     packages=find_packages(),
-    #namespace_package=['faster_rcnn_tf'],
-    #py_modules=['faster_rcnn_tf','handlers'],
-    install_requires=[
+    #packages=['faster_rcnn_tf'],
+    #py_modules=['faster_rcnn_tf'],
+    install_requires=['lib_fast_rcnn'
     ],
     test_suite='',
     tests_require=[],
