@@ -97,30 +97,36 @@ class FastRCNNTf:
 	    # Detect all object classes and regress object bounds
 	    timer = Timer()
 	    timer.tic()
-	    scores, boxes = im_detect(self.sess, self.net, image.get_cv_im())
-	    timer.toc()
-	    image.processing_time = timer.total_time
 
-	    if module_cfg.DEBUG:
-	    	print ('Detection took {:.3f}s for '
-	        	'{:d} object proposals').format(timer.total_time, boxes.shape[0])
+	    cv_im = image.get_cv_im()
+	    if not cv_im is None:
+	        scores, boxes = im_detect(self.sess, self.net, cv_im )
+	        timer.toc()
+	        image.processing_time = timer.total_time
 
-	    for cls_ind, cls in enumerate(module_cfg.CLASSES[1:]):
-	        cls_ind += 1 # because we skipped background
-	        cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
-	        cls_scores = scores[:, cls_ind]
-	        dets = np.hstack((cls_boxes,
-	                          cls_scores[:, np.newaxis])).astype(np.float32)
-	        keep = nms(dets, module_cfg.NMS_THRESH)
-	        dets = dets[keep, :]
-	        self.vis_detections(image, cls, dets, thresh=module_cfg.CONF_THRESH)
+	        if module_cfg.DEBUG:
+	    	    print ('Detection took {:.3f}s for '
+	        	    '{:d} object proposals').format(timer.total_time, boxes.shape[0])
 
-#	    image_incl_objs = image.get_annotated_image()
+	        for cls_ind, cls in enumerate(module_cfg.CLASSES[1:]):
+	            cls_ind += 1 # because we skipped background
+	            cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
+	            cls_scores = scores[:, cls_ind]
+	            dets = np.hstack((cls_boxes,
+	                              cls_scores[:, np.newaxis])).astype(np.float32)
+	            keep = nms(dets, module_cfg.NMS_THRESH)
+	            dets = dets[keep, :]
+	            self.vis_detections(image, cls, dets, thresh=module_cfg.CONF_THRESH)
 
-	    if (events_handler != None) and (hasattr(events_handler,'processing_done')):
-	        events_handler.processing_done(image, image.processing_time, image.get_objects())
+#	        image_incl_objs = image.get_annotated_image()
+
+	        if (events_handler != None) and (hasattr(events_handler,'processing_done')):
+	            events_handler.processing_done(image, image.processing_time, image.get_objects())
+	        else:
+	            return image.get_vis()
 	    else:
-	        return image.get_vis()
+	        timer.toc()
+	        return None
 
 def init_tf_network(model):
 	global __INSTANCE__
