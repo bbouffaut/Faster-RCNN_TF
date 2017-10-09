@@ -30,31 +30,32 @@ class ProcessedImage:
     def add_object(self, vis_object):
 	self.objects.append(vis_object)
 
-    def get_objects(self):
-	return self.objects
+    def get_objects(self, classes):
+	return [obj for obj in self.objects if obj.class_name in classes]
 
-    def write_annotated_image(self, target_filename):
+    def write_annotated_image(self, target_filename, classes):
 
 	font = cv2.FONT_HERSHEY_SIMPLEX
 
         for obj in self.objects:
-            bbox = obj.bbox
-	    score = obj.score
+	    if obj.class_name in classes:
+                bbox = obj.bbox
+	        score = obj.score
 
-	    cv2.rectangle(self.cv_im,
-		(int(round(bbox[0])), int(round(bbox[1]))),
-		(int(round(bbox[2])), int(round(bbox[3]))),
-		(255, 0 ,0),
-		2)
+	        cv2.rectangle(self.cv_im,
+		    (int(round(bbox[0])), int(round(bbox[1]))),
+		    (int(round(bbox[2])), int(round(bbox[3]))),
+		    (255, 0 ,0),
+		    2)
 
-	    cv2.putText(self.cv_im,
-		'{:s} {:.3f}'.format(obj.class_name, score),
-		(int(round(bbox[0])), int(round(bbox[1])) - 5),	
-		font,
-		0.8,
-		(255, 0, 0),
-		2,	
-		cv2.LINE_AA)
+	        cv2.putText(self.cv_im,
+		    '{:s} {:.3f}'.format(obj.class_name, score),
+		    (int(round(bbox[0])), int(round(bbox[1])) - 5),	
+		    font,
+		    0.8,
+		    (255, 0, 0),
+		    2,	
+		    cv2.LINE_AA)
 
 	cv2.imwrite(target_filename, self.cv_im)
 
@@ -121,7 +122,7 @@ class FastRCNNTf:
 #	        image_incl_objs = image.get_annotated_image()
 
 	        if (events_handler != None) and (hasattr(events_handler,'processing_done')):
-	            events_handler.processing_done(image, image.processing_time, image.get_objects())
+	            events_handler.processing_done(image, image.processing_time, image.objects)
 	        else:
 	            return image.get_vis()
 	    else:
