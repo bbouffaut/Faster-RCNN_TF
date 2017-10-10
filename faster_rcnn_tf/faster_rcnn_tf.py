@@ -6,7 +6,7 @@ from lib_fast_rcnn.networks.factory import get_network
 from config import cfg as module_cfg
 from lib_fast_rcnn.utils.timer import Timer
 import numpy as np
-import os, sys, cv2
+import os, sys, cv2, json
 
 global __INSTANCE__
 __INSTANCE__ = None
@@ -126,6 +126,8 @@ class FastRCNNTf:
 	        else:
 	            return image.get_vis()
 	    else:
+	        if module_cfg.DEBUG:
+	            print('process_image %s: cv_im is None..??' % image_name)
 	        timer.toc()
 	        return None
 
