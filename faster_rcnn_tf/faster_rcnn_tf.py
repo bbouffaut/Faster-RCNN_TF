@@ -57,7 +57,7 @@ class ProcessedImage:
 		    2,	
 		    cv2.LINE_AA)
 
-	cv2.imwrite(target_filename, self.cv_im)
+	cv2.imwrite(target_filename, self.cv_im, [int(cv2.IMWRITE_JPEG_QUALITY), module_cfg.JPEG_QUALITY])
 
 
 class FastRCNNTf:

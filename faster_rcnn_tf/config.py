@@ -19,3 +19,4 @@ __C.CLASSES = ('__background__',
 
 __C.CONF_THRESH = 0.8
 __C.NMS_THRESH = 0.3
+__C.JPEG_QUALITY = 75
