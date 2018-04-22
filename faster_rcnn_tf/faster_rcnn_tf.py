@@ -50,11 +50,11 @@ class ProcessedImage:
 
                 cv2.putText(self.cv_im,
                     '{:s} {:.3f}'.format(obj.class_name, score),
-                    (int(round(bbox[0])), int(round(bbox[1])) - 5), 
+                    (int(round(bbox[0])), int(round(bbox[1])) - 5),
                     font,
                     0.8,
                     (255, 0, 0),
-                    2,  
+                    2,
                     cv2.LINE_AA)
 
         cv2.imwrite(target_filename, self.cv_im, [int(cv2.IMWRITE_JPEG_QUALITY), module_cfg.JPEG_QUALITY])
@@ -68,7 +68,7 @@ class FastRCNNTf:
         # init session
         self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         # load network
-        self.net = get_network(module_cfg.NET_TYPE)     
+        self.net = get_network(module_cfg.NET_TYPE)
         # load model
         self.saver = tf.train.Saver()
         self.saver.restore(self.sess, model)
@@ -86,11 +86,11 @@ class FastRCNNTf:
         for i in inds:
             vis_object = VisObject()
             vis_object.bbox = dets[i, :4]
-            vis_object.score = dets[i, -1]  
+            vis_object.score = dets[i, -1]
             vis_object.class_name = class_name
             image.add_object(vis_object)
-         
-    
+
+
 
     def process_image(self, image_name, events_handler):
         """Detect object classes in an image using pre-computed object proposals."""
@@ -137,6 +137,8 @@ def init_tf_network(model):
     if __INSTANCE__ is None:
         __INSTANCE__ = FastRCNNTf(model)
 
+    return __INSTANCE__
+
 def process_image(image,events_handler):
     global __INSTANCE__
 
@@ -144,7 +146,7 @@ def process_image(image,events_handler):
         raise Exception('Fast_Rcnn_tf shall be initialized first: call init_tf_network(model)')
 
     return __INSTANCE__.process_image(image, events_handler)
-    
+
 
 # #########################################################
 # Below is the code on case of direct usage from command-line
