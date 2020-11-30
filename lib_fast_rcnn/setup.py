@@ -10,6 +10,7 @@ from setuptools import find_packages, Extension
 
 setup(
     name='lib_fast_rcnn',
+    version="0.0.2",
     packages=find_packages(),
     package_data = {
         # If any package contains *.txt or *.rst files, include them:
