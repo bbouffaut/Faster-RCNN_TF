@@ -1,6 +1,7 @@
 __author__ = 'yuxiang'
 
-import datasets
+import lib_fast_rcnn.datasets
+import lib_fast_rcnn.datasets.nissan
 import os
 import PIL
 import lib_fast_rcnn.datasets.imdb

@@ -7,7 +7,7 @@
 
 import os
 from lib_fast_rcnn.datasets.imdb import imdb
-import ds_utils as ds_utils
+import lib_fast_rcnn.datasets.ds_utils as ds_utils
 import xml.etree.ElementTree as ET
 import numpy as np
 import scipy.sparse
