@@ -12,8 +12,8 @@
 import _init_paths
 from fast_rcnn.train import get_training_roidb, train_net
 from fast_rcnn.config import cfg,cfg_from_file, cfg_from_list, get_output_dir
+from datasets.factory import get_imdb
 from networks.factory import get_network
-from datasets.factory import factory as datasets_factory
 import argparse
 import pprint
 import numpy as np
@@ -53,10 +53,6 @@ def parse_args():
     parser.add_argument('--set', dest='set_cfgs',
                         help='set config keys', default=None,
                         nargs=argparse.REMAINDER)
-    parser.add_argument('--classes', dest='classes',
-                        help='set object classes to be detected', default=None,
-                        nargs='+')
-
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -82,20 +78,9 @@ if __name__ == '__main__':
     if not args.randomize:
         # fix the random seeds (numpy and caffe) for reproducibility
         np.random.seed(cfg.RNG_SEED)
-
-    if (args.classes != None):
-        if ('__background__' not in args.classes):
-            args.classes.insert(0,'__background__')
-
-    print("DEBUG train_net {0}".format(args.classes))
-
-    df = datasets_factory(args.classes)
-    imdb = df.get_imdb(args.imdb_name)
-    print 'Loaded dataset `{:s}` for training with classes={}'.format(imdb.name,imdb.classes)
-    if (args.classes != None):
-        roidb = get_training_roidb(imdb,[i for i, j in enumerate(imdb.classes) if j in args.classes])
-    else:
-        roidb = get_training_roidb(imdb,[i for i, j in enumerate(imdb.classes)])
+    imdb = get_imdb(args.imdb_name)
+    print 'Loaded dataset `{:s}` for training'.format(imdb.name)
+    roidb = get_training_roidb(imdb)
 
     output_dir = get_output_dir(imdb, None)
     print 'Output will be saved to `{:s}`'.format(output_dir)
@@ -103,7 +88,7 @@ if __name__ == '__main__':
     device_name = '/{}:{:d}'.format(args.device,args.device_id)
     print device_name
 
-    network = get_network(args.network_name, args.classes)
+    network = get_network(args.network_name)
     print 'Use network `{:s}` in training'.format(args.network_name)
 
     train_net(network, imdb, roidb, output_dir,

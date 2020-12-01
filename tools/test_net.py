@@ -12,8 +12,8 @@
 import _init_paths
 from fast_rcnn.test import test_net
 from fast_rcnn.config import cfg, cfg_from_file
+from datasets.factory import get_imdb
 from networks.factory import get_network
-from datasets.factory import factory as datasets_factory
 import argparse
 import pprint
 import time, os, sys
@@ -47,9 +47,6 @@ def parse_args():
     parser.add_argument('--network', dest='network_name',
                         help='name of the network',
                         default=None, type=str)
-    parser.add_argument('--classes', dest='classes',
-                        help='set object classes to be detected', default=None,
-                        nargs='+')
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -76,17 +73,13 @@ if __name__ == '__main__':
 
     weights_filename = os.path.splitext(os.path.basename(args.model))[0]
 
-    if ('__background__' not in args.classes):
-        args.classes = args.classes.append('__background__')
-
-    df = datasets_factory(args.classes)
-    imdb = df.get_imdb(args.imdb_name)
+    imdb = get_imdb(args.imdb_name)
     imdb.competition_mode(args.comp_mode)
 
     device_name = '/{}:{:d}'.format(args.device,args.device_id)
     print device_name
 
-    network = get_network(args.network_name,args.classes)
+    network = get_network(args.network_name)
     print 'Use network `{:s}` in training'.format(args.network_name)
 
     if args.device == 'gpu':
