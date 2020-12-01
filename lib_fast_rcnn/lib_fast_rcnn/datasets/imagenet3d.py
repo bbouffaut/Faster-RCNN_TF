@@ -1,7 +1,6 @@
 __author__ = 'yuxiang' # derived from honda.py by fyang
 
-import lib_fast_rcnn.datasets
-import lib_fast_rcnn.datasets.imagenet3d
+import datasets
 import os
 import PIL
 import lib_fast_rcnn.datasets.imdb

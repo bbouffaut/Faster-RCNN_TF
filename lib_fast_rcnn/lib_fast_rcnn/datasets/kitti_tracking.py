@@ -1,7 +1,6 @@
 __author__ = 'yuxiang'
 
-import lib_fast_rcnn.datasets
-import lib_fast_rcnn.datasets.kitti_tracking
+import datasets
 import os
 import PIL
 import lib_fast_rcnn.datasets.imdb

@@ -5,8 +5,7 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
-import lib_fast_rcnn.datasets
-import lib_fast_rcnn.datasets.pascal_voc
+import datasets
 import os
 import PIL
 import lib_fast_rcnn.datasets.imdb
