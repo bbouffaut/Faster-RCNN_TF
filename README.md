@@ -130,8 +130,21 @@ The demo.py will load the above pretrained Faster-RCNN_TF network that includes 
 | tvmonitor   | 0.666 |
 | mAP        | 0.681 |
 
+## Troubleshooting
 
-###References
+### AssertionError whn training: assert (boxes[:, 2] >= boxes[:, 0]).all()
+There should be no <ymin>0</ymin> nor <xmin>0</xmin> in an object.
+
+I changed that in the Annotations folder with the two commands (./ means the current folder is Annotations):
+```Shell
+grep -rl '<ymin>0</ymin>' ./ | xargs sed -i 's#<ymin>0</ymin>#<ymin>1</ymin>#g'
+```
+and
+```Shell
+grep -rl '<xmin>0</xmin>' ./ | xargs sed -i 's#<xmin>0</xmin>#<xmin>1</xmin>#g'
+```
+
+## References
 [Faster R-CNN caffe version](https://github.com/rbgirshick/py-faster-rcnn)
 
 [A tensorflow implementation of SubCNN (working progress)](https://github.com/yuxng/SubCNN_TF)
