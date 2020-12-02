@@ -18,3 +18,4 @@ dist/*
 lib_fast_rcnn/*.egg-info/*
 *.swp
 ILSVRC2014_devkit/
+.vscode
