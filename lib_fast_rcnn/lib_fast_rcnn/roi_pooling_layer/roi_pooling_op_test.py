@@ -30,7 +30,7 @@ loss = tf.reduce_mean(tf.square(y - y_data))
 optimizer = tf.train.GradientDescentOptimizer(0.5)
 train = optimizer.minimize(loss)
 
-init = tf.global_variables_initializer()
+init = tf.initialize_all_variables()
 
 # Launch the graph.
 sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
