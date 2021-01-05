@@ -254,12 +254,13 @@ def filter_roidb(roidb):
     return filtered_roidb
 
 
-def train_net(network, imdb, roidb, output_dir, pretrained_model=None, max_iters=40000):
+def train_net(network, imdb, roidb, output_dir, device_name, pretrained_model=None, max_iters=40000) :
     """Train a Fast R-CNN network."""
     roidb = filter_roidb(roidb)
     saver = tf.train.Saver(max_to_keep=100)
-    with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
-        sw = SolverWrapper(sess, saver, network, imdb, roidb, output_dir, pretrained_model=pretrained_model)
-        print 'Solving...'
-        sw.train_model(sess, max_iters)
-        print 'done solving'
+    with tf.device(device_name):
+        with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
+            sw = SolverWrapper(sess, saver, network, imdb, roidb, output_dir, pretrained_model=pretrained_model)
+            print 'Solving...'
+            sw.train_model(sess, max_iters)
+            print 'done solving'

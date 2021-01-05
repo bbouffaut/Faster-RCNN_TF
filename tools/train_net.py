@@ -91,6 +91,6 @@ if __name__ == '__main__':
     network = get_network(args.network_name)
     print 'Use network `{:s}` in training'.format(args.network_name)
 
-    train_net(network, imdb, roidb, output_dir,
+    train_net(network, imdb, roidb, output_dir, device_name,
               pretrained_model=args.pretrained_model,
               max_iters=args.max_iters)
